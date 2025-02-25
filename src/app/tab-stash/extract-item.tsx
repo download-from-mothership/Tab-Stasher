@@ -7,8 +7,10 @@ import { z } from "zod"
 import { createClient } from "@supabase/supabase-js"
 import { env } from "@/lib/env"
 
+// Initialize FireCrawl with API key
 const app = new FireCrawlApp({ apiKey: "fc-65d71811097a491c98800ca693d884b6" })
 
+// Define the schema for scraped data
 const schema = z.object({
   item: z.array(
     z.object({
@@ -30,43 +32,51 @@ export function ExtractItem({ url }: ExtractItemProps) {
   const [error, setError] = useState<string | null>(null)
   const [scrapedData, setScrapedData] = useState<any>(null)
 
-  const supabase = createClient(env().SUPABASE_URL, env().SUPABASE_ANON_KEY)
+  // Initialize Supabase client
+  const supabase = createClient(env().SUPABASE_URL || "", env().SUPABASE_ANON_KEY || "")
 
   const handleExtract = async () => {
     setLoading(true)
     setError(null)
     try {
+      // Scrape the URL using FireCrawl
       const scrapeResult = await app.scrapeUrl(url, {
         formats: ["json"],
         jsonOptions: { schema: schema },
       })
 
+      // Check if scrape was successful
       if (!scrapeResult.success) {
         throw new Error(`Failed to scrape: ${scrapeResult.error}`)
       }
 
-      if (scrapeResult.success && scrapeResult.data) {
-        setScrapedData(scrapeResult.data)
+      // Check if scraped data contains 'item' key
+      if (scrapeResult.json && 'item' in scrapeResult.json) {
+        // Set scrapedData to the entire json object
+        setScrapedData(scrapeResult.json)
         setExtracted(true)
 
-        // Save the scraped data to Supabase
+        // Get current user from Supabase
         const { data: userData, error: userError } = await supabase.auth.getUser()
-        if (userError) {
-          console.error("Error getting user:", userError)
+        if (userError || !userData.user) {
+          console.error("Error getting user or user not logged in:", userError)
+          setError("You must be logged in to extract items.")
           return
         }
 
+        // Insert scraped data into Supabase
         const { data, error } = await supabase.from("scraped_items").insert({
           url: url,
-          data: scrapeResult.data,
-          user_id: userData.user?.id,
+          data: scrapeResult.json,
+          user_id: userData.user.id,
         })
 
         if (error) {
           console.error("Error saving to Supabase:", error)
+          setError("Failed to save extracted data.")
         }
       } else {
-        throw new Error("Scraped data is undefined or unsuccessful")
+        throw new Error("Scraped data does not contain 'item' key")
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred during extraction")
@@ -90,10 +100,10 @@ export function ExtractItem({ url }: ExtractItemProps) {
           {scrapedData.item.map((item: any, index: number) => (
             <div key={index} className="mb-4 p-4 bg-white dark:bg-neutral-700 rounded-lg">
               <p>
-                <strong>Price:</strong> {item.price}
+                <strong>Price:</strong> {item.price || "N/A"}
               </p>
               <p>
-                <strong>Description:</strong> {item.description}
+                <strong>Description:</strong> {item.description || "No description"}
               </p>
               {item.photos && item.photos.length > 0 && (
                 <div>
@@ -120,4 +130,3 @@ export function ExtractItem({ url }: ExtractItemProps) {
     </div>
   )
 }
-

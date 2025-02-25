@@ -77,7 +77,7 @@ function LoginComponent() {
               </button>
               <p className="text-neutral-600 dark:text-neutral-400 text-sm text-center mt-8">
                 Don&apos;t have an account?{" "}
-                <Link href="/auth/create-account" className="text-neutral-500 dark:text-neutral-300">
+                <Link href="/auth/create-account" className="text-blue-500 hover:underline">
                   Sign up
                 </Link>
               </p>
