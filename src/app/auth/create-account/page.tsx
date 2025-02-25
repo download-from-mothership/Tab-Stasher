@@ -2,48 +2,59 @@
 
 import { useState } from "react"
 import type React from "react"
-import "./create-account.css"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { AuroraBackground } from "@/components/ui/aurora-background"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
-import FireCrawlApp from "@mendable/firecrawl-js"
-import { z } from "zod"
 
-const app = new FireCrawlApp({ apiKey: "fc-65d71811097a491c98800ca693d884b6" })
-
-const schema = z.object({
-  item: z.array(
-    z.object({
-      price: z.string().optional(),
-      description: z.string().optional(),
-      photos: z.array(z.string()).optional(),
-    }),
-  ),
-  is_open_source: z.boolean(),
-})
-
-export default function LoginPage() {
-  return <LoginComponent />
+export default function CreateAccountPage() {
+  return <CreateAccountComponent />
 }
 
-function LoginComponent() {
+function CreateAccountComponent() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [tabUrl, setTabUrl] = useState("")
-  const [extractedData, setExtractedData] = useState(null)
-  const [isExtracting, setIsExtracting] = useState(false)
-  const [extractionError, setExtractionError] = useState(null)
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log("Logging in with:", { email, password })
-    // Simulating a successful login
-    router.push("/tab-stash")
+    setError(null)
+    
+    if (password !== confirmPassword) {
+      setError("Passwords do not match")
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      const response = await fetch("/api/create-account", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create account")
+      }
+
+      // Show success message and redirect to login
+      alert(data.message)
+      router.push("/auth/login")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -59,49 +70,63 @@ function LoginComponent() {
         className="relative flex flex-col gap-4 items-center justify-center px-4 min-h-screen"
       >
         <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
-          {!isLoggedIn ? (
-            <>
-              <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">Welcome Back</h2>
-              <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
-                Log in to continue to your account
+          <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">Create Account</h2>
+          <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
+            Sign up to get started with Tab Stasher
+          </p>
+
+          <form className="my-8" onSubmit={handleSubmit}>
+            <LabelInputContainer className="mb-4">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                placeholder="projectmayhem@fc.com"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </LabelInputContainer>
+            <LabelInputContainer className="mb-4">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                placeholder="••••••••"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </LabelInputContainer>
+            <LabelInputContainer className="mb-4">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                placeholder="••••••••"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </LabelInputContainer>
+
+            <div className="login-container">
+              {error && (
+                <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
+              )}
+              <button
+                className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+                type="submit"
+                disabled={isLoading}
+              >
+                {isLoading ? "Creating Account..." : "Create Account →"}
+                <BottomGradient />
+              </button>
+              <p className="text-neutral-600 dark:text-neutral-400 text-sm text-center mt-8">
+                Already have an account?{" "}
+                <Link href="/auth/login" className="text-neutral-500 dark:text-neutral-300">
+                  Log in
+                </Link>
               </p>
-
-              <form className="my-8" onSubmit={handleSubmit}>
-                <LabelInputContainer className="mb-4">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input
-                    id="email"
-                    placeholder="projectmayhem@fc.com"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </LabelInputContainer>
-                <LabelInputContainer className="mb-4">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    placeholder="••••••••"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </LabelInputContainer>
-
-                <div className="login-container">
-                  <button
-                    className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
-                    type="submit"
-                  >
-                    Log in &rarr;
-                    <BottomGradient />
-                  </button>
-                </div>
-              </form>
-            </>
-          ) : (
-            <></>
-          )}
+            </div>
+          </form>
         </div>
       </motion.div>
     </AuroraBackground>
