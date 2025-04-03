@@ -16,15 +16,20 @@ import { scrapeUrl } from "@/lib/firecrawl"
 import { extractTitle } from "@/lib/gemini"
 import { TabCard } from "@/app/ui/tab-card"
 import { toast } from "sonner"
+import { supabase } from "@/lib/supabase"
+import { config } from "@/lib/config"
 
 interface ScrapedData {
   url: string
-  markdown?: string
+  markdown?: string | null
   metadata: {
     title?: string | null
     description?: string | null
     image?: string | null
     favicon?: string | null
+    'og:image'?: string | null
+    'twitter:image'?: string | null
+    [key: string]: string | null | undefined
   }
 }
 
@@ -47,6 +52,8 @@ export function AddTabDialog() {
       
       if (result.error) {
         toast.error(result.error)
+        setIsProcessing(false)
+        setIsLoading(false)
         return
       }
 
@@ -55,54 +62,79 @@ export function AddTabDialog() {
         url,
         markdown: result.content,
         metadata: {
-          title: result.title,
-          description: result.description,
-          image: result.image,
-          favicon: result.favicon,
+          title: result.title || result.metadata?.title || null,
+          description: result.description || result.metadata?.description || null,
+          image: result.image || null,
+          favicon: result.favicon || result.metadata?.favicon || null,
+          ...result.metadata
         }
       }
       setScrapedData(data)
 
-      // Step 2: Use Gemini to extract a title from the markdown
-      if (data.markdown) {
-        const titleResult = await extractTitle(data.markdown)
-        if (!titleResult.error) {
-          data.metadata.title = titleResult.text
-          setScrapedData({ ...data, metadata: { ...data.metadata, title: titleResult.text } })
-        }
-      }
-
       // Step 3: Store the tab in Supabase
-      const response = await fetch('/api/tabs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      try {
+        console.log('Sending tab data:', {
           url: data.url,
-          title: data.metadata.title || null,
+          title: data.metadata.title || 'Untitled',
           description: data.metadata.description || null,
           image: data.metadata.image || null,
           favicon: data.metadata.favicon || null,
           content: data.markdown || null,
-          tags: [], // TODO: Add tag support
-        }),
-      })
+        })
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Failed to create tab')
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin
+        const response = await fetch(`${baseUrl}/api/tabs`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            url: data.url,
+            title: data.metadata.title || 'Untitled',
+            description: data.metadata.description || null,
+            image: data.metadata.image || null,
+            favicon: data.metadata.favicon || null,
+            content: data.markdown || null,
+            tags: [], // TODO: Add tag support
+          }),
+        })
+
+        if (!response.ok) {
+          const responseText = await response.text()
+          console.error('Error response:', {
+            status: response.status,
+            statusText: response.statusText,
+            body: responseText
+          })
+          
+          let errorMessage: string
+          try {
+            const errorData = JSON.parse(responseText)
+            errorMessage = errorData.error || 'Failed to create tab'
+          } catch (e) {
+            console.error('Error parsing error response:', e)
+            errorMessage = 'Failed to create tab'
+          }
+          
+          throw new Error(errorMessage)
+        }
+
+        const newTab = await response.json()
+        console.log('Successfully created tab:', newTab)
+        toast.success("Tab added successfully!")
+        setIsProcessing(false)
+        handleClose()
+      } catch (error) {
+        console.error('Error creating tab:', error)
+        toast.error(error instanceof Error ? error.message : "Failed to add tab. Please try again.")
+        setIsProcessing(false)
       }
-
-      toast.success("Tab added successfully!")
-      setIsProcessing(false)
     } catch (error) {
       toast.error("Failed to add tab. Please try again.")
       console.error(error)
       setIsProcessing(false)
-      setScrapedData(null)
-    } finally {
       setIsLoading(false)
+      setScrapedData(null)
     }
   }
 
@@ -121,7 +153,7 @@ export function AddTabDialog() {
           Add Tab
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[725px]">
         <DialogHeader>
           <DialogTitle>Add New Tab</DialogTitle>
           <DialogDescription>
@@ -130,15 +162,18 @@ export function AddTabDialog() {
         </DialogHeader>
 
         {!scrapedData ? (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              type="url"
-              placeholder="https://example.com"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              required
-              disabled={isLoading}
-            />
+          <form onSubmit={handleSubmit} className="mt-4 space-y-8">
+            <div className="space-y-2">
+              <Input
+                type="url"
+                placeholder="https://example.com"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                required
+                disabled={isLoading}
+                className="w-full"
+              />
+            </div>
             <div className="flex justify-end gap-2">
               <Button
                 type="button"
@@ -163,10 +198,10 @@ export function AddTabDialog() {
         ) : (
           <div className="space-y-4">
             <TabCard
-              title={scrapedData.metadata.title}
+              title={scrapedData.metadata.title || ""}
               images={scrapedData.metadata.image ? [scrapedData.metadata.image] : []}
-              description={scrapedData.metadata.description}
-              favicon={scrapedData.metadata.favicon}
+              description={scrapedData.metadata.description || ""}
+              favicon={scrapedData.metadata.favicon || undefined}
             />
             <div className="flex justify-end gap-2">
               <Button

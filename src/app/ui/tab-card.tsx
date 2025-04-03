@@ -12,92 +12,60 @@ interface TabCardProps {
   images: string[]
   description?: string | null
   favicon?: string | null
+  onClick?: () => void
 }
 
-export function TabCard({ title, images, description, favicon }: TabCardProps) {
-  const [currentImageIndex, setCurrentImageIndex] = React.useState(0)
-  const hasMultipleImages = images.length > 1
+function getProxiedImageUrl(url: string) {
+  if (!url) return ''
+  // If the URL is already relative or a data URL, return as is
+  if (url.startsWith('/') || url.startsWith('data:')) return url
+  // Otherwise, proxy it through our API
+  return `/api/image-proxy?url=${encodeURIComponent(url)}`
+}
 
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % images.length)
-  }
-
-  const previousImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)
-  }
+export function TabCard({
+  title,
+  description,
+  images,
+  favicon,
+  onClick,
+}: TabCardProps) {
+  const mainImage = images && images.length > 0 ? getProxiedImageUrl(images[0]) : null
+  const proxyFavicon = favicon ? getProxiedImageUrl(favicon) : null
 
   return (
-    <Card className="overflow-hidden">
-      {/* Image Carousel */}
-      <div className="relative aspect-video">
-        {images.length > 0 ? (
-          <>
-            <Image
-              src={images[currentImageIndex]}
-              alt={`Image ${currentImageIndex + 1}`}
-              fill
-              className="object-cover"
-            />
-            {hasMultipleImages && (
-              <>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70"
-                  onClick={previousImage}
-                >
-                  <ChevronLeft className="h-4 w-4 text-white" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70"
-                  onClick={nextImage}
-                >
-                  <ChevronRight className="h-4 w-4 text-white" />
-                </Button>
-                <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1">
-                  {images.map((_, index) => (
-                    <button
-                      key={index}
-                      className={cn(
-                        "h-1.5 w-1.5 rounded-full bg-white/50 transition-all",
-                        currentImageIndex === index && "w-3 bg-white"
-                      )}
-                      onClick={() => setCurrentImageIndex(index)}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </>
-        ) : (
-          <div className="flex h-full items-center justify-center bg-muted">
-            <span className="text-sm text-muted-foreground">No image available</span>
-          </div>
+    <div
+      className="flex flex-col space-y-1.5 p-6 cursor-pointer hover:bg-accent rounded-lg transition-colors"
+      onClick={onClick}
+    >
+      <div className="flex items-center space-x-2">
+        {proxyFavicon && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={proxyFavicon}
+            alt="favicon"
+            className="w-4 h-4"
+          />
         )}
+        <h3 className="font-semibold leading-none tracking-tight">
+          {title || "Untitled"}
+        </h3>
       </div>
-
-      {/* Title and Description */}
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          {favicon && (
-            <Image
-              src={favicon}
-              alt="Site favicon"
-              width={16}
-              height={16}
-              className="h-4 w-4"
-            />
-          )}
-          <CardTitle className="line-clamp-2">{title || "Untitled"}</CardTitle>
+      {mainImage && (
+        <div className="relative w-full aspect-video overflow-hidden rounded-md">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={mainImage}
+            alt={title || "Tab preview"}
+            className="object-cover w-full h-full"
+          />
         </div>
-        {description && (
-          <p className="line-clamp-2 text-sm text-muted-foreground">
-            {description}
-          </p>
-        )}
-      </CardHeader>
-    </Card>
+      )}
+      {description && (
+        <p className="text-sm text-muted-foreground line-clamp-2">
+          {description}
+        </p>
+      )}
+    </div>
   )
 } 
