@@ -15,7 +15,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
-export function LoginForm({
+export function SignUpForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
@@ -31,23 +31,28 @@ export function LoginForm({
     const formData = new FormData(event.currentTarget)
     const email = formData.get("email") as string
     const password = formData.get("password") as string
+    const confirmPassword = formData.get("confirmPassword") as string
 
     try {
-      // TODO: Replace with actual authentication logic
-      console.log("Login attempt with:", { email, password })
+      if (password !== confirmPassword) {
+        throw new Error("Passwords do not match")
+      }
+
+      // TODO: Replace with actual signup logic
+      console.log("Sign up attempt with:", { email, password })
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000))
       
       // For testing purposes, accept any non-empty credentials
       if (email && password) {
-        console.log("Login successful")
+        console.log("Sign up successful")
         router.push("/dashboard") // Redirect to dashboard on success
       } else {
         throw new Error("Invalid credentials")
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to login")
+      setError(err instanceof Error ? err.message : "Failed to sign up")
     } finally {
       setIsLoading(false)
     }
@@ -57,9 +62,9 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
+          <CardTitle className="text-xl">Create an account</CardTitle>
           <CardDescription>
-            Login with your Apple or Google account
+            Sign up with your Apple or Google account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -77,7 +82,7 @@ export function LoginForm({
                       fill="currentColor"
                     />
                   </svg>
-                  Login with Apple
+                  Sign up with Apple
                 </Button>
                 <Button type="button" variant="outline" className="w-full relative pl-8">
                   <svg 
@@ -90,7 +95,7 @@ export function LoginForm({
                       fill="currentColor"
                     />
                   </svg>
-                  Login with Google
+                  Sign up with Google
                 </Button>
               </div>
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
@@ -111,18 +116,20 @@ export function LoginForm({
                   />
                 </div>
                 <div className="grid gap-2">
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Password</Label>
-                    <Link
-                      href="#"
-                      className="ml-auto text-sm underline-offset-4 hover:underline"
-                    >
-                      Forgot your password?
-                    </Link>
-                  </div>
+                  <Label htmlFor="password">Password</Label>
                   <Input 
                     id="password" 
                     name="password"
+                    type="password" 
+                    required 
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Input 
+                    id="confirmPassword" 
+                    name="confirmPassword"
                     type="password" 
                     required 
                     disabled={isLoading}
@@ -134,13 +141,13 @@ export function LoginForm({
                   </div>
                 )}
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Logging in..." : "Login"}
+                  {isLoading ? "Creating account..." : "Create account"}
                 </Button>
               </div>
               <div className="text-center text-sm">
-                Don&apos;t have an account?{" "}
-                <Link href="/signup" className="underline underline-offset-4">
-                  Sign up
+                Already have an account?{" "}
+                <Link href="/login" className="underline underline-offset-4">
+                  Login
                 </Link>
               </div>
             </div>
@@ -153,4 +160,4 @@ export function LoginForm({
       </div>
     </div>
   )
-}
+} 
