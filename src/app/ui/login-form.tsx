@@ -3,17 +3,20 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/app/ui/button"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/app/ui/card"
+  LoginCard,
+  LoginCardContent,
+  LoginCardDescription,
+  LoginCardHeader,
+  LoginCardTitle,
+} from "@/app/ui/login-card"
 import { Input } from "@/app/ui/input"
 import { Label } from "@/app/ui/label"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { createBrowserClient } from '@supabase/ssr'
+import { toast } from "sonner"
+import { config } from "@/lib/config"
 
 export function LoginForm({
   className,
@@ -33,21 +36,59 @@ export function LoginForm({
     const password = formData.get("password") as string
 
     try {
-      // TODO: Replace with actual authentication logic
-      console.log("Login attempt with:", { email, password })
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // For testing purposes, accept any non-empty credentials
-      if (email && password) {
-        console.log("Login successful")
-        router.push("/dashboard") // Redirect to dashboard on success
-      } else {
-        throw new Error("Invalid credentials")
+      const supabase = createBrowserClient(
+        config.supabase.url,
+        config.supabase.anonKey
+      )
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (error) {
+        console.error('Auth error:', error)
+        throw error
       }
+
+      console.log('Sign in successful:', {
+        hasSession: !!data.session,
+        user: data.user?.email
+      })
+
+      // Show success message
+      toast.success("Logged in successfully")
+      
+      // Ensure session is established
+      const { data: { session } } = await supabase.auth.getSession()
+      console.log('Initial session check:', {
+        hasSession: !!session,
+        user: session?.user?.email
+      })
+
+      if (!session) {
+        console.log('Waiting for session to be established...')
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        const { data: { session: retrySession } } = await supabase.auth.getSession()
+        console.log('Retry session check:', {
+          hasSession: !!retrySession,
+          user: retrySession?.user?.email
+        })
+        if (!retrySession) {
+          throw new Error('Failed to establish session')
+        }
+      }
+      
+      // Refresh and redirect
+      router.refresh()
+      await new Promise(resolve => setTimeout(resolve, 100)) // Small delay to ensure refresh completes
+      router.replace('/dashboard')
+      
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to login")
+      console.error("Login error:", err)
+      const errorMessage = err instanceof Error ? err.message : "Failed to login"
+      setError(errorMessage)
+      toast.error(errorMessage)
     } finally {
       setIsLoading(false)
     }
@@ -55,14 +96,14 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
-          <CardDescription>
+      <LoginCard>
+        <LoginCardHeader className="text-center">
+          <LoginCardTitle className="text-xl">Welcome back</LoginCardTitle>
+          <LoginCardDescription>
             Login with your Apple or Google account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </LoginCardDescription>
+        </LoginCardHeader>
+        <LoginCardContent>
           <form onSubmit={onSubmit}>
             <div className="grid gap-6">
               <div className="flex flex-col gap-4">
@@ -145,8 +186,8 @@ export function LoginForm({
               </div>
             </div>
           </form>
-        </CardContent>
-      </Card>
+        </LoginCardContent>
+      </LoginCard>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
         By clicking continue, you agree to our <Link href="#">Terms of Service</Link>{" "}
         and <Link href="#">Privacy Policy</Link>.

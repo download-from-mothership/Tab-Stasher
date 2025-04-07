@@ -4,6 +4,7 @@ import { createBrowserClient } from '@supabase/ssr'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { config } from '@/lib/config'
+import { SessionProvider } from 'next-auth/react'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -25,5 +26,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     }
   }, [router])
 
-  return children
+  return (
+    <SessionProvider>
+      {children}
+    </SessionProvider>
+  )
 } 

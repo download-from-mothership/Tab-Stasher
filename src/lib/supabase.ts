@@ -1,13 +1,24 @@
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 import { config } from './config'
+import { corsHeaders } from '@/app/_shared/cors'
 
-export const supabase = createClient(
+export const supabase = createBrowserClient(
   config.supabase.url,
   config.supabase.anonKey,
   {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
+    cookies: {
+      get(name: string) {
+        return document.cookie
+          .split('; ')
+          .find((row) => row.startsWith(`${name}=`))
+          ?.split('=')[1]
+      },
+      set(name: string, value: string, options: { path?: string; maxAge?: number; domain?: string; secure?: boolean }) {
+        document.cookie = `${name}=${value}${options.path ? `; path=${options.path}` : ''}${options.maxAge ? `; max-age=${options.maxAge}` : ''}${options.domain ? `; domain=${options.domain}` : ''}${options.secure ? '; secure' : ''}`
+      },
+      remove(name: string, options: { path?: string; domain?: string }) {
+        document.cookie = `${name}=; max-age=0${options.path ? `; path=${options.path}` : ''}${options.domain ? `; domain=${options.domain}` : ''}`
+      }
     }
   }
 )

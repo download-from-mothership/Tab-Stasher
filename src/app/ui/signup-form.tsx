@@ -14,6 +14,8 @@ import { Label } from "@/app/ui/label"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { supabase } from "@/lib/supabase"
+import { toast } from "sonner"
 
 export function SignUpForm({
   className,
@@ -38,21 +40,24 @@ export function SignUpForm({
         throw new Error("Passwords do not match")
       }
 
-      // TODO: Replace with actual signup logic
-      console.log("Sign up attempt with:", { email, password })
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // For testing purposes, accept any non-empty credentials
-      if (email && password) {
-        console.log("Sign up successful")
-        router.push("/dashboard") // Redirect to dashboard on success
-      } else {
-        throw new Error("Invalid credentials")
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`
+        }
+      })
+
+      if (error) {
+        throw error
       }
+
+      toast.success("Check your email to confirm your account")
+      router.push("/login")
     } catch (err) {
+      console.error("Signup error:", err)
       setError(err instanceof Error ? err.message : "Failed to sign up")
+      toast.error(err instanceof Error ? err.message : "Failed to sign up")
     } finally {
       setIsLoading(false)
     }

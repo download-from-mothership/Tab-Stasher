@@ -4,6 +4,7 @@ import { GalleryVerticalEnd } from "lucide-react"
 import { TabGroups } from "@/app/ui/tab-groups"
 import { AddTabDialog } from "@/app/ui/add-tab-dialog"
 import { Button } from "@/app/ui/button"
+import { AuthButton } from "@/app/ui/auth-button"
 
 export default function DashboardPage() {
   return (
@@ -18,8 +19,9 @@ export default function DashboardPage() {
             <div className="w-full flex-1 md:w-auto md:flex-none">
               {/* Add search functionality later */}
             </div>
-            <nav className="flex items-center space-x-2">
+            <nav className="flex items-center space-x-4">
               <AddTabDialog />
+              <AuthButton />
             </nav>
           </div>
         </div>

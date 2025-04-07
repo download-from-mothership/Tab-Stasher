@@ -1,7 +1,20 @@
 import { config } from './config'
-import FireCrawlApp, { ScrapeResponse } from '@mendable/firecrawl-js'
+import type { FireCrawlApp, ScrapeResponse } from '@mendable/firecrawl-js'
 
-const app = new FireCrawlApp({ apiKey: config.firecrawl.apiKey })
+// Import the default export dynamically to handle ESM/CJS compatibility
+let FireCrawlAppConstructor: typeof FireCrawlApp
+if (typeof window !== 'undefined') {
+  FireCrawlAppConstructor = require('@mendable/firecrawl-js').default
+} else {
+  FireCrawlAppConstructor = class MockFireCrawlApp {
+    constructor() {}
+    async scrapeUrl() {
+      throw new Error('FireCrawlApp is not available on the server')
+    }
+  } as unknown as typeof FireCrawlApp
+}
+
+const app = new FireCrawlAppConstructor({ apiKey: config.firecrawl.apiKey })
 
 export interface FirecrawlResponse {
   title?: string | null

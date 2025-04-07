@@ -1,75 +1,69 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
+"use client";
+import { Sheet } from "@silk-hq/components";
+import "@/styles/silk-card.css";
 
-const Card = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "rounded-xl border bg-card text-card-foreground shadow",
-      className
-    )}
-    {...props}
-  />
-))
-Card.displayName = "Card"
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
+   presentTrigger: React.ReactNode;
+   sheetContent: React.ReactNode;
+}
 
-const CardHeader = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6", className)}
-    {...props}
-  />
-))
-CardHeader.displayName = "CardHeader"
+const Card = ({ presentTrigger, sheetContent, ...restProps }: Props) => {
+   return (
+      <Sheet.Root license="commercial" {...restProps}>
+         {presentTrigger}
+         <Sheet.Portal>
+            <Sheet.View
+               className="Card-view"
+               contentPlacement="center"
+               tracks="top"
+               enteringAnimationSettings={{
+                  easing: "spring",
+                  stiffness: 260,
+                  damping: 20,
+                  mass: 1,
+               }}
+               nativeEdgeSwipePrevention={true}
+            >
+               <Sheet.Backdrop
+                  className="Card-backdrop"
+                  travelAnimation={{
+                     opacity: ({ progress }) => Math.min(0.4 * progress, 0.4),
+                  }}
+                  themeColorDimming="auto"
+               />
+               <Sheet.Content
+                  className="Card-content"
+                  travelAnimation={{
+                     scale: [0.8, 1],
+                  }}
+               >
+                  {sheetContent}
+               </Sheet.Content>
+            </Sheet.View>
+         </Sheet.Portal>
+      </Sheet.Root>
+   );
+};
 
-const CardTitle = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
-  <h3
-    ref={ref}
-    className={cn("font-semibold leading-none tracking-tight", className)}
-    {...props}
-  />
-))
-CardTitle.displayName = "CardTitle"
+// For backward compatibility, we'll export the same structure but with the Silk implementation
+const CardHeader = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+   <div {...props}>{children}</div>
+);
 
-const CardDescription = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => (
-  <p
-    ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
-    {...props}
-  />
-))
-CardDescription.displayName = "CardDescription"
+const CardTitle = ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+   <h3 {...props}>{children}</h3>
+);
 
-const CardContent = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
-))
-CardContent.displayName = "CardContent"
+const CardDescription = ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+   <p {...props}>{children}</p>
+);
 
-const CardFooter = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex items-center p-6 pt-0", className)}
-    {...props}
-  />
-))
-CardFooter.displayName = "CardFooter"
+const CardContent = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+   <div {...props}>{children}</div>
+);
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+const CardFooter = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+   <div {...props}>{children}</div>
+);
+
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };

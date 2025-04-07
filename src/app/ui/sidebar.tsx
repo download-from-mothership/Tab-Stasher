@@ -12,7 +12,7 @@ import {
   Archive,
   PlusSquare,
   Settings,
-  User,
+  User as UserIcon,
   CalendarDays,
   Menu,
   ChevronLeft,
@@ -26,14 +26,17 @@ import {
 } from "lucide-react"
 import { Button } from "@/app/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/ui/avatar"
+import { supabase } from "@/lib/supabase"
+import { useEffect, useState } from "react"
+import { User } from "@supabase/supabase-js"
 
 type CollapsibleMode = "offcanvas" | "icon" | "none"
 
-interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
+interface CustomSidebarProps extends React.HTMLAttributes<HTMLElement> {
   defaultOpen?: boolean
   collapsible?: CollapsibleMode
   isCollapsed?: boolean
-  onCollapsedChange?: (collapsed: boolean) => void
+  onCollapsedChange?: (isCollapsed: boolean) => void
 }
 
 interface SidebarGroupProps {
@@ -72,23 +75,32 @@ function SidebarGroup({ title, subtitle, children, isCollapsed }: SidebarGroupPr
   );
 }
 
-export function Sidebar({ 
+export function CustomSidebar({ 
   className, 
   defaultOpen = true, 
   collapsible = "none",
   isCollapsed: controlledCollapsed,
   onCollapsedChange,
   ...props 
-}: SidebarProps) {
+}: CustomSidebarProps) {
   const [isOpen, setIsOpen] = React.useState(defaultOpen)
-  const [uncontrolledCollapsed, setUncontrolledCollapsed] = React.useState(false)
+  const [isCollapsed, setIsCollapsed] = React.useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false)
-  
-  const isCollapsed = controlledCollapsed ?? uncontrolledCollapsed
-  const setIsCollapsed = React.useCallback((value: boolean) => {
-    setUncontrolledCollapsed(value)
-    onCollapsedChange?.(value)
-  }, [onCollapsedChange])
+  const [user, setUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+    })
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   const showCollapseButton = collapsible === "icon"
   const showOffcanvasButton = collapsible === "offcanvas"
@@ -186,7 +198,7 @@ export function Sidebar({
             className="w-full p-2 justify-center"
             onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
           >
-            <User className="h-4 w-4" />
+            <UserIcon className="h-4 w-4" />
           </Button>
         ) : (
           <div className="space-y-1">
@@ -195,7 +207,9 @@ export function Sidebar({
               className="w-full justify-between p-2"
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
             >
-              <span className="font-semibold">john.doe@example.com</span>
+              <span className="font-semibold truncate">
+                {user?.email || 'Loading...'}
+              </span>
               <ChevronDown 
                 className={cn(
                   "h-4 w-4 transition-transform",
@@ -205,7 +219,7 @@ export function Sidebar({
             </Button>
             {isUserMenuOpen && (
               <div className="pt-1 space-y-1">
-                <NavItem icon={User} label="Account" collapsed={isCollapsed} />
+                <NavItem icon={UserIcon} label="Account" collapsed={isCollapsed} />
                 <NavItem icon={CalendarDays} label="Billing" collapsed={isCollapsed} />
                 <NavItem icon={LogOut} label="Sign out" collapsed={isCollapsed} />
               </div>

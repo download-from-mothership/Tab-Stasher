@@ -1,0 +1,29 @@
+.Card-view {
+   /* SELF-LAYOUT */
+   z-index: 1;
+   /* Adding 60px to make it fully visible below iOS Safari's
+    bottom UI */
+   height: calc(var(--silk-100-lvh-dvh-pct) + 60px);
+}
+
+.Card-content {
+   /* SELF-LAYOUT */
+   width: 97%;
+   height: auto;
+   max-width: 580px;
+   aspect-ratio: 8 / 10;
+
+   /* APPEARANCE */
+   background-color: transparent;
+   border-radius: var(--radius-7);
+   background-color: white;
+   box-shadow: var(--shadow-2);
+
+   /* INNER-LAYOUT */
+   padding: var(--size-3);
+}
+@media (min-width: 550px) {
+   .Card-content {
+      aspect-ratio: 9 / 10;
+   }
+} 

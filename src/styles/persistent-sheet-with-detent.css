@@ -1,0 +1,76 @@
+.PersistentSheetWithDetent-view {
+   /* SELF-LAYOUT */
+   z-index: 1;
+   bottom: -1px; /* Avoid subpixel misalignment in Safari */
+   width: 100%;
+   height: calc(100% + 1px); /* +1px to compensate for the bottom -1px */
+}
+.PersistentSheetWithDetent-view.detent2-true {
+   bottom: initial;
+   top: 0;
+}
+
+.PersistentSheetWithDetent-content {
+   /* SELF-LAYOUT */
+   height: 100%;
+
+   /* APPEARANCE */
+   box-shadow: 0 -4px 6px -1px rgb(0 0 0 / 0.1), 0 -2px 4px -2px rgb(0 0 0 / 0.1);
+   background-color: rgba(63, 165, 225, 1);
+   background-image: radial-gradient(ellipse 150% 75% at 85% 100%, rgba(149, 205, 238, 1), rgba(63, 165, 225, 1));
+}
+.PersistentSheetWithDetent-content.detent2-true {
+   height: 100%;
+}
+
+.PersistentSheetWithDetent-themeColorDimmingController {
+   position: absolute;
+   width: 0;
+   height: 0;
+}
+
+.PersistentSheetWithDetent-backdrop {
+   /* TRANSFORMATION */
+   opacity: 0;
+}
+
+.PersistentSheetWithDetent-actualContent {
+   /* INNER-LAYOUT */
+   height: 100%;
+   width: 100%;
+
+   /* INNER-LAYOUT */
+   padding-top: env(safe-area-inset-top, 0px);
+   display: grid;
+   position: relative;
+}
+
+.PersistentSheetWithDetent-retractedContentContainer {
+   /* SELF-LAYOUT */
+   position: absolute;
+   top: 0;
+   width: 100%;
+   height: 76px;
+}
+
+.PersistentSheetWithDetent-expandTrigger {
+   /* SELF-LAYOUT */
+   position: absolute;
+   top: 0;
+   width: 100%;
+   height: 76px;
+
+   /* APPEARANCE */
+   appearance: none;
+   border: none;
+   background-color: transparent;
+}
+
+.PersistentSheetWithDetent-expandedContentContainer {
+   /* SELF-LAYOUT */
+   grid-column: 1;
+   grid-row: 1 / -1;
+
+   /* INNER-LAYOUT */
+   display: grid;
+} 

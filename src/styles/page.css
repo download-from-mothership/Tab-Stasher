@@ -1,0 +1,104 @@
+.Page-view {
+   /* SELF-LAYOUT */
+   z-index: 1;
+   /* Adding 60px to make it fully visible below iOS Safari's
+    bottom UI */
+   height: calc(var(--silk-100-lvh-dvh-pct) + 60px);
+}
+
+.Page-content {
+   /* SELF-LAYOUT */
+   width: 100%;
+
+   /* APPEARANCE */
+   background-color: white;
+   box-shadow: var(--shadow-4);
+}
+
+.Home-root {
+  /* INNER-LAYOUT */
+  position: relative;
+}
+
+.Home-main {
+  /* APPEARANCE */
+  overflow: hidden;
+  overflow: clip;
+  background-color: white;
+  /* INNER-LAYOUT */
+  position: relative;
+}
+
+.Home-scrollContainer {
+  /* APPEARANCE */
+  background-color: white;
+}
+
+.Home-examples {
+  /* INNER-LAYOUT */
+  padding: var(--size-10);
+  padding-top: calc(var(--size-10) + 49px);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--size-10);
+}
+
+.Home-topBar {
+  /* SELF-LAYOUT */
+  position: fixed;
+  top: -1px;
+  z-index: 1; /* So it is above ParallaxPage, which overlaps it to avoid subpixel offset */
+  width: 100%;
+  height: calc(env(safe-area-inset-top) + 49px);
+}
+
+.Home-topBarContent {
+  /* SELF-LAYOUT */
+  height: 49px;
+
+  /* APPEARANCE */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.066);
+  background-color: white;
+  /* INNER-LAYOUT */
+  padding-right: var(--x-collapsed-scrollbar-thickness);
+  display: grid;
+  grid-template-columns: 75px 1fr 75px;
+  place-content: center;
+}
+
+.Home-topBarMenuLeftContainer {
+  /* SELF-LAYOUT */
+  grid-column: 1 / 3;
+  grid-row: 1;
+  justify-self: start;
+  /* INNER-LAYOUT */
+  display: grid;
+  justify-items: start;
+  padding-left: var(--size-7);
+}
+
+.Home-topBarMenuLeftContainer > * {
+  grid-area: 1 / 1;
+  justify-self: start;
+  align-self: center;
+}
+
+.Home-topBarMenuTitleContainer {
+  /* SELF-LAYOUT */
+  grid-column: 2 / 3;
+  grid-row: 1;
+  /* INNER-LAYOUT */
+  display: grid;
+  place-content: center;
+  place-items: center;
+  /* TEXT */
+  text-box: trim-both cap alphabetic;
+  font-size: 17.25px;
+  font-weight: 620;
+  color: var(--gray-9);
+}
+
+.Home-topBarMenuTitleContainer > * {
+  grid-area: 1 / 1;
+  place-self: center;
+} 
