@@ -11,74 +11,96 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
   try {
-    const { url, title, content } = await request.json()
+    const { url, markdownContent } = await request.json()
 
-    if (!url || !content) {
+    if (!url || !markdownContent) {
       return NextResponse.json(
-        { error: 'URL and content are required' },
+        { error: 'URL and Markdown content are required' },
         { status: 400 }
       )
     }
 
-    const prompt = `Analyze this webpage content and generate:
-1. A clear, concise title (max 60 chars)
-2. 3-4 relevant category tags that best describe this content
+    const prompt = `Analyze the following Markdown content from the provided URL.
 
-Content URL: ${url}
-Current title: ${title || 'Untitled'}
-Content: ${content?.slice(0, 1500)}
+Extract a concise title (max 60 characters) that accurately represents the item described in the content.
 
-You must respond in this exact JSON format:
+Identify a relevant image URL (if present) that is the primary image representing the item. If no suitable image URL is found, indicate "null".
+
+Generate 3-4 single-word tags that categorize the item and represent its key attributes. These tags should be general categories (e.g., "technology", "clothing", "furniture") or key features (e.g., "portable", "durable", "wireless"). All tags should be in lowercase.
+
+Respond with a JSON object in the following format:
+
+\`\`\`json
 {
-  "title": "clear concise title",
+  "title": "extracted title",
+  "image": "image URL or null",
   "tags": ["tag1", "tag2", "tag3"]
 }
+\`\`\`
 
-The tags should be single words or short phrases (max 2 words) that categorize the content. Focus on general categories like "technology", "business", "education", etc.
+Markdown Content:
+${markdownContent}
+`;
 
-Remember to only respond with valid JSON, nothing else.`
-
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' })
     
     const result = await model.generateContent(prompt)
-    const response = result.response
-    
-    try {
-      // First try to parse the response text directly
-      const analysis = JSON.parse(response.text())
-      
-      // Validate the response structure
-      if (!analysis.title || !Array.isArray(analysis.tags)) {
-        throw new Error('Invalid response structure')
-      }
-      
-      return NextResponse.json({
-        title: analysis.title.slice(0, 60), // Enforce max length
-        tags: analysis.tags.slice(0, 4).map(tag => tag.toLowerCase()) // Ensure consistent format
-      })
-    } catch (parseError) {
-      console.error('Failed to parse Gemini response:', parseError)
-      console.log('Raw response:', response.text())
-      
-      // Attempt to extract JSON from the response if direct parsing fails
-      const text = response.text()
-      const jsonMatch = text.match(/\{[\s\S]*\}/)
-      
-      if (!jsonMatch) {
-        throw new Error('Could not extract valid JSON from response')
-      }
-      
-      const extractedAnalysis = JSON.parse(jsonMatch[0])
-      
-      return NextResponse.json({
-        title: extractedAnalysis.title.slice(0, 60),
-        tags: extractedAnalysis.tags.slice(0, 4).map(tag => tag.toLowerCase())
-      })
+
+    let responseText = result.response?.text();
+
+    if (!responseText) {
+      return NextResponse.json({ error: 'Failed to get a response from Gemini' }, { status: 500 })
     }
-  } catch (error) {
-    console.error('Error analyzing content:', error)
+    
+    console.log('/api/analyze-content - Raw Gemini Response:', responseText);  //  Log the raw response
+
+    try {
+      let analysis;
+
+      // 1. Trim whitespace and newlines
+      responseText = responseText.trim();
+
+      // 2. Remove any leading or trailing non-JSON characters (e.g., extra text, code blocks)
+      responseText = responseText.replace(/^[^\{]*\{/, '{').replace(/\}[^}]*$/, '}');
+
+      // 3. Replace single quotes with double quotes (if necessary) -  Be cautious with this, might break valid JSON
+      // responseText = responseText.replace(/'/g, '"');
+
+      try {
+        analysis = JSON.parse(responseText); //  First try direct parsing
+      } catch (e) {
+        // If direct parsing fails, try to extract JSON from the response
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/); //  Find the first JSON-like block
+        if (jsonMatch) {
+          analysis = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error('Could not extract valid JSON from Gemini response');
+        }
+      }
+
+      console.log('/api/analyze-content - Parsed Analysis:', JSON.stringify(analysis, null, 2));  //  Log the parsed analysis
+
+      if (!analysis.title || !Array.isArray(analysis.tags)) {
+        throw new Error('Invalid response format from Gemini');
+      }
+
+      const responseData = {
+        title: analysis.title,
+        image: analysis.image,
+        tags: analysis.tags
+      };
+
+      console.log('/api/analyze-content - Final response to frontend:', JSON.stringify(responseData, null, 2));  //  Log the final response
+
+      return NextResponse.json(responseData);
+    } catch (parseError) {
+      console.error('Failed to parse Gemini response:', parseError);
+      return NextResponse.json({ error: 'Failed to parse Gemini response' }, { status: 500 });
+    }
+  } catch (error: any) {
+    console.error('Error analyzing Markdown content:', error)
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to analyze content' },
+      { error: error.message || 'Failed to analyze Markdown content' },
       { status: 500 }
     )
   }

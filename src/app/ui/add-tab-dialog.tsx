@@ -69,9 +69,9 @@ export function AddTabDialog() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setScrapedData(null)
+    e.preventDefault();
+    setIsLoading(true);
+    setScrapedData(null);
 
     try {
       // Step 1: Scrape the URL content and metadata using our secure API
@@ -79,52 +79,71 @@ export function AddTabDialog() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url })
-      })
+      });
 
       if (!scrapeResponse.ok) {
-        const error = await scrapeResponse.json()
-        throw new Error(error.error || 'Failed to scrape URL')
+        const error = await scrapeResponse.json();
+        throw new Error(error.error || 'Failed to scrape URL');
       }
 
-      const result = await scrapeResponse.json()
-      
+      const result = await scrapeResponse.json();
+
       if (result.error) {
-        toast.error(result.error)
-        setIsLoading(false)
-        return
+        toast.error(result.error);
+        setIsLoading(false);
+        return;
       }
 
       // Step 2: Use Gemini to analyze the content
-      const response = await fetch('/api/analyze-content', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          url: url,
-          title: result.title || '',
-          content: result.content || '',
-        })
-      })
+      const dataToSend = {
+        url: url,
+        markdownContent: result.content || '',
+      };
+      console.log('Sending to /api/analyze-content:', JSON.stringify(dataToSend, null, 2));
+      console.log('URL value:', url);
+      console.log('Markdown content value:', result.content);
+      
+      try {
+        const response = await fetch('/api/analyze-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dataToSend),
+        });
 
-      if (!response.ok) {
-        throw new Error('Failed to analyze content')
+        console.log('Analyze content response status:', response.status);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Analyze content error response:', errorData);
+          throw new Error(errorData.error || 'Failed to analyze content');
+        }
+
+        const analysis = await response.json();
+        console.log('Analyze content success response:', analysis);
+
+        if (!analysis || !analysis.title || !Array.isArray(analysis.tags)) {
+          throw new Error('Invalid response from content analysis');
+        }
+
+        // Store processed data
+        const data: ScrapedData = {
+          url,
+          title: analysis.title || result.title || 'Untitled',
+          image: analysis.image || result.image || result.metadata?.['og:image'] || null,
+          tags: analysis.tags || []
+        };
+        setScrapedData(data);
+      } catch (error) {
+        console.error('Error in analyze-content API call:', error);
+        throw error; // Re-throw to be caught by the outer try-catch
       }
-
-      const analysis = await response.json()
-
-      // Store processed data
-      const data: ScrapedData = {
-        url,
-        title: analysis.title || result.title || 'Untitled',
-        image: result.image || result.metadata?.['og:image'] || null,
-        tags: analysis.tags || []
-      }
-      setScrapedData(data)
     } catch (error) {
-      console.error('Error:', error)
-      toast.error(error instanceof Error ? error.message : 'Failed to process URL')
-      setIsLoading(false)
+      console.error('Error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to process URL');
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleSave = async () => {
     if (!scrapedData) return
@@ -200,7 +219,7 @@ export function AddTabDialog() {
 
             {scrapedData && (
               <div className="space-y-4">
-                <SilkCard className="w-full">
+                <div className="w-full bg-white rounded-lg shadow-sm">
                   <div className="p-4 space-y-4">
                     <div className="flex items-start gap-4">
                       {scrapedData.image && (
@@ -270,7 +289,7 @@ export function AddTabDialog() {
                       )}
                     </div>
                   </div>
-                </SilkCard>
+                </div>
               </div>
             )}
 

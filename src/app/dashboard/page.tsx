@@ -5,6 +5,7 @@ import { TabGroups } from "@/app/ui/tab-groups"
 import { AddTabDialog } from "@/app/ui/add-tab-dialog"
 import { Button } from "@/app/ui/button"
 import { AuthButton } from "@/app/ui/auth-button"
+import { TabList } from "@/app/ui/tab-list"
 
 export default function DashboardPage() {
   return (
@@ -32,13 +33,22 @@ export default function DashboardPage() {
         <div className="flex flex-col gap-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">Your Tab Groups</h1>
+              <h1 className="text-3xl font-bold tracking-tight">Your Tabs</h1>
               <p className="text-muted-foreground">
-                Manage and organize your saved tab collections
+                View and manage your saved tabs
               </p>
             </div>
-            <div className="flex items-center gap-4">
-              {/* Add new group button later */}
+          </div>
+          
+          {/* Tabs Grid */}
+          <TabList />
+
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Your Tab Groups</h2>
+              <p className="text-muted-foreground">
+                Organize your tabs into collections
+              </p>
             </div>
           </div>
           

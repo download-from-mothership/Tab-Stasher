@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { FireCrawlApp } from '@mendable/firecrawl-js'
+import FireCrawlApp from '@mendable/firecrawl-js'
 
 if (!process.env.FIRECRAWL_API_KEY) {
   throw new Error('Missing FIRECRAWL_API_KEY environment variable')
@@ -22,9 +22,15 @@ export async function POST(request: Request) {
 
     const scrapeResult = await app.scrapeUrl(url, { formats: ['markdown', 'html'] })
 
+    console.log('/api/scrape-url - scrapeResult (full):', JSON.stringify(scrapeResult, null, 2))
+
     if (!scrapeResult.success) {
       throw new Error(`Failed to scrape: ${scrapeResult.error}`)
     }
+
+    console.log('/api/scrape-url - scrapeResult.markdown:', scrapeResult.markdown)
+    console.log('/api/scrape-url - scrapeResult.html:', scrapeResult.html)
+    console.log('/api/scrape-url - scrapeResult.metadata:', scrapeResult.metadata)
 
     // Prioritize the main image selection
     const mainImage = scrapeResult.metadata?.image || 

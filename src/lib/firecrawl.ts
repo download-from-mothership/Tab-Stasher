@@ -1,20 +1,8 @@
 import { config } from './config'
-import type { FireCrawlApp, ScrapeResponse } from '@mendable/firecrawl-js'
+import FireCrawlApp from '@mendable/firecrawl-js'
+import type { ScrapeResponse } from '@mendable/firecrawl-js'
 
-// Import the default export dynamically to handle ESM/CJS compatibility
-let FireCrawlAppConstructor: typeof FireCrawlApp
-if (typeof window !== 'undefined') {
-  FireCrawlAppConstructor = require('@mendable/firecrawl-js').default
-} else {
-  FireCrawlAppConstructor = class MockFireCrawlApp {
-    constructor() {}
-    async scrapeUrl() {
-      throw new Error('FireCrawlApp is not available on the server')
-    }
-  } as unknown as typeof FireCrawlApp
-}
-
-const app = new FireCrawlAppConstructor({ apiKey: config.firecrawl.apiKey })
+const app = new FireCrawlApp({ apiKey: config.firecrawl.apiKey })
 
 export interface FirecrawlResponse {
   title?: string | null
@@ -86,9 +74,13 @@ export async function scrapeUrl(url: string): Promise<FirecrawlResponse> {
       throw new Error('Firecrawl API key is not configured')
     }
 
+    if (!app?.scrapeUrl) {
+      throw new Error('Firecrawl App instance is not initialized.')
+    }
+
     console.log('Starting URL scrape for:', url)
 
-    const scrapeResult = await app.scrapeUrl(url, { formats: ['markdown', 'html'] }) as ScrapeResponse
+    const scrapeResult = await app.scrapeUrl(url, { formats: ['markdown'] }) as ScrapeResponse
 
     if (!scrapeResult.success) {
       throw new Error(`Failed to scrape: ${scrapeResult.error}`)
