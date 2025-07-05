@@ -10,4 +10,14 @@ export const config = {
   gemini: {
     apiKey: process.env.GEMINI_API_KEY || '',
   },
+  gcs: {
+    bucket: process.env.GCS_BUCKET || '',
+  },
+  redis: {
+    url: process.env.REDIS_URL || '',
+  },
+  vision: {
+    apiKey: process.env.GOOGLE_VISION_API_KEY || '',
+    keyFilePath: process.env.GOOGLE_VISION_KEY_FILE || '',
+  },
 } as const 
