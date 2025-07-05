@@ -7,4 +7,7 @@ export const config = {
     url: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
     anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
   },
+  gemini: {
+    apiKey: process.env.GEMINI_API_KEY || '',
+  },
 } as const 

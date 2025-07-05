@@ -45,6 +45,18 @@ export function AddTabDialog({ onTabSaved }: AddTabDialogProps) {
   const [tagInput, setTagInput] = React.useState("")
   const [customTags, setCustomTags] = React.useState<string[]>([])
 
+  // Debug effect to log when scrapedData changes
+  React.useEffect(() => {
+    if (scrapedData) {
+      console.log('scrapedData updated with tags:', scrapedData.tags)
+      console.log('scrapedData tags length:', scrapedData.tags?.length)
+      console.log('scrapedData tags is array:', Array.isArray(scrapedData.tags))
+      console.log('Full scrapedData object:', scrapedData)
+    } else {
+      console.log('scrapedData is null')
+    }
+  }, [scrapedData])
+
   const handleAddCustomTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && tagInput.trim()) {
       e.preventDefault()
@@ -56,7 +68,12 @@ export function AddTabDialog({ onTabSaved }: AddTabDialogProps) {
     }
   }
 
-  const handleRemoveTag = (tag: string) => {
+  const handleRemoveTag = (tag: string, e?: React.MouseEvent) => {
+    // Prevent event bubbling to avoid closing the sheet
+    if (e) {
+      e.stopPropagation()
+    }
+    
     if (customTags.includes(tag)) {
       setCustomTags(customTags.filter(t => t !== tag))
     } else if (scrapedData) {
@@ -104,6 +121,7 @@ export function AddTabDialog({ onTabSaved }: AddTabDialogProps) {
       let analysis = null
       if (result.content) {
         try {
+          console.log('Calling analyze-content API with content length:', result.content.length)
           const analysisResponse = await fetch('/api/analyze-content', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -116,10 +134,20 @@ export function AddTabDialog({ onTabSaved }: AddTabDialogProps) {
           if (analysisResponse.ok) {
             analysis = await analysisResponse.json()
             console.log('Analysis result:', analysis)
+            console.log('Analysis tags:', analysis.tags)
+            console.log('Analysis tags type:', typeof analysis.tags)
+            console.log('Analysis tags length:', analysis.tags?.length)
+            console.log('Analysis tags is array:', Array.isArray(analysis.tags))
+          } else {
+            const errorData = await analysisResponse.json()
+            console.error('Analysis API error:', errorData)
           }
         } catch (error) {
           console.warn('Analysis failed, using scraped data only:', error)
+          console.log('Gemini API failed, will use fallback tags')
         }
+      } else {
+        console.log('No content available for analysis')
       }
 
       // Store processed data
@@ -135,6 +163,9 @@ export function AddTabDialog({ onTabSaved }: AddTabDialogProps) {
         secondaryCategory: analysis?.secondaryCategory,
         confidence: analysis?.confidence
       }
+      console.log('Setting scrapedData with tags:', data.tags)
+      console.log('Full scrapedData:', data)
+      console.log('Tags array length in final data:', data.tags.length)
       setScrapedData(data)
     } catch (error) {
       console.error('Error:', error)
@@ -269,22 +300,28 @@ export function AddTabDialog({ onTabSaved }: AddTabDialogProps) {
 
                     <div className="space-y-2">
                       <div className="flex flex-wrap gap-2">
-                        {scrapedData.tags.map((tag) => (
-                          <div
-                            key={tag}
-                            className={`flex items-center gap-1 px-2 py-1 rounded-md ${getTagColor(tag)}`}
-                            onDoubleClick={() => handleRemoveTag(tag)}
-                          >
-                            <span className="text-sm">{tag}</span>
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveTag(tag)}
-                              className="opacity-60 hover:opacity-100"
+                        {scrapedData.tags && scrapedData.tags.length > 0 ? (
+                          scrapedData.tags.map((tag) => (
+                            <div
+                              key={tag}
+                              className={`flex items-center gap-1 px-2 py-1 rounded-md ${getTagColor(tag)}`}
+                              onDoubleClick={() => handleRemoveTag(tag)}
                             >
-                              <X className="h-3 w-3" />
-                            </button>
+                              <span className="text-sm">{tag}</span>
+                              <button
+                                type="button"
+                                onClick={(e) => handleRemoveTag(tag, e)}
+                                className="opacity-60 hover:opacity-100"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-sm text-muted-foreground">
+                            No tags generated. Add custom tags below.
                           </div>
-                        ))}
+                        )}
                       </div>
 
                       <Input
@@ -306,7 +343,7 @@ export function AddTabDialog({ onTabSaved }: AddTabDialogProps) {
                               <span className="text-sm">{tag}</span>
                               <button
                                 type="button"
-                                onClick={() => handleRemoveTag(tag)}
+                                onClick={(e) => handleRemoveTag(tag, e)}
                                 className="opacity-60 hover:opacity-100"
                               >
                                 <X className="h-3 w-3" />

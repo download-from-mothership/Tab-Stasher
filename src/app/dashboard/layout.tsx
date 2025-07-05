@@ -1,11 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { Menu } from "lucide-react"
-import { Button } from "@/app/ui/button"
-import { SilkSidebar } from "@/app/ui/silk-sidebar"
-import { SidebarContent } from "@/app/ui/sidebar-content"
-import "@/styles/silk-sidebar.css"
+// import { Menu } from "lucide-react"
+// import { Button } from "@/app/ui/button"
+// import { SilkSidebar } from "@/app/ui/silk-sidebar"
+// import { SidebarContent } from "@/app/ui/sidebar-content"
+// import "@/styles/silk-sidebar.css"
 
 export default function DashboardLayout({
   children,
@@ -14,8 +14,8 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="flex min-h-screen">
-      {/* Silk Sidebar */}
-      <SilkSidebar
+      {/* Temporarily removed sidebar components */}
+      {/* <SilkSidebar
         presentTrigger={
           <div className="block md:hidden">
             <Button
@@ -30,12 +30,11 @@ export default function DashboardLayout({
         sheetContent={<SidebarContent />}
       />
 
-      {/* Desktop Sidebar */}
       <div className="hidden md:block md:w-64 md:flex-shrink-0">
         <SidebarContent />
-      </div>
+      </div> */}
 
-      <main className="flex-1 flex flex-col">{children}</main>
+      <main className="flex-1 flex flex-col w-full">{children}</main>
     </div>
   )
 } 

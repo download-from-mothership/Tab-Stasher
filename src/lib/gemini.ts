@@ -1,24 +1,65 @@
-import { GoogleGenAI } from '@google/genai'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 import { config } from './config'
 
-const ai = new GoogleGenAI({ apiKey: config.gemini.apiKey })
+// Initialize with timeout configuration
+const genAI = new GoogleGenerativeAI(config.gemini.apiKey)
 
 export interface GeminiResponse {
   text: string
   error?: string
 }
 
+// Helper function for timeout handling
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number = 30000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
+    )
+  ])
+}
+
+// Helper function for exponential backoff retry
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> {
+  let lastError: Error
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn()
+    } catch (error) {
+      lastError = error as Error
+      
+      if (attempt === maxRetries) {
+        throw lastError
+      }
+      
+      const delay = baseDelay * Math.pow(2, attempt)
+      console.log(`Gemini API attempt ${attempt + 1} failed, retrying in ${delay}ms...`)
+      await new Promise(resolve => setTimeout(resolve, delay))
+    }
+  }
+  
+  throw lastError!
+}
+
 async function listAvailableModels() {
   try {
-    const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models',
-      {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${config.gemini.apiKey}`,
-          'Content-Type': 'application/json',
+    const response = await withTimeout(
+      fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models',
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${config.gemini.apiKey}`,
+            'Content-Type': 'application/json',
+          }
         }
-      }
+      ),
+      10000 // 10 second timeout for model listing
     )
     
     if (!response.ok) {
@@ -41,10 +82,9 @@ async function makeGeminiRequest(prompt: string): Promise<GeminiResponse> {
       throw new Error('Gemini API key is not configured')
     }
 
-    const response = await ai.models.generateContent({
-      model: "gemini-pro",
-      contents: prompt,
-      config: {
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.0-flash-001",
+      generationConfig: {
         maxOutputTokens: 2048,
         temperature: 1,
         topP: 0.95,
@@ -52,7 +92,14 @@ async function makeGeminiRequest(prompt: string): Promise<GeminiResponse> {
       }
     })
 
-    return { text: response.text }
+    const result = await retryWithBackoff(async () => {
+      return await withTimeout(
+        model.generateContent(prompt),
+        30000 // 30 second timeout
+      )
+    })
+
+    return { text: result.response.text() }
   } catch (error) {
     console.error('Error making Gemini request:', error)
     return {

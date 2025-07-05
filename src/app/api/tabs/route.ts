@@ -9,6 +9,43 @@ export const dynamic = 'force-dynamic'
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
+// Helper function for timeout handling
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number = 30000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
+    )
+  ])
+}
+
+// Helper function for exponential backoff retry
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> {
+  let lastError: Error
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn()
+    } catch (error) {
+      lastError = error as Error
+      
+      if (attempt === maxRetries) {
+        throw lastError
+      }
+      
+      const delay = baseDelay * Math.pow(2, attempt)
+      console.log(`Gemini API attempt ${attempt + 1} failed, retrying in ${delay}ms...`)
+      await new Promise(resolve => setTimeout(resolve, delay))
+    }
+  }
+  
+  throw lastError!
+}
+
 export async function POST(request: Request) {
   // Create Supabase client inside the request handler
   const cookieStore = cookies()
@@ -272,8 +309,21 @@ Format:
   "confidence": 0.92
 }`
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' })
-    const result = await model.generateContent(prompt)
+    const model = genAI.getGenerativeModel({ 
+      model: 'gemini-2.0-flash-001',
+      generationConfig: {
+        maxOutputTokens: 1024,
+        temperature: 0.7,
+      }
+    })
+    
+    const result = await retryWithBackoff(async () => {
+      return await withTimeout(
+        model.generateContent(prompt),
+        15000 // 15 second timeout for categorization
+      )
+    })
+    
     const responseText = result.response?.text()
 
     if (!responseText) {

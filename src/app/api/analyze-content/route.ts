@@ -9,6 +9,43 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
 
 export const dynamic = 'force-dynamic'
 
+// Helper function to create a fetch with timeout
+function fetchWithTimeout(url: string, options: RequestInit, timeoutMs: number = 30000): Promise<Response> {
+  return Promise.race([
+    fetch(url, options),
+    new Promise<Response>((_, reject) =>
+      setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
+    )
+  ])
+}
+
+// Helper function for exponential backoff retry
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> {
+  let lastError: Error
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn()
+    } catch (error) {
+      lastError = error as Error
+      
+      if (attempt === maxRetries) {
+        throw lastError
+      }
+      
+      const delay = baseDelay * Math.pow(2, attempt)
+      console.log(`Attempt ${attempt + 1} failed, retrying in ${delay}ms...`)
+      await new Promise(resolve => setTimeout(resolve, delay))
+    }
+  }
+  
+  throw lastError!
+}
+
 export async function POST(request: Request) {
   try {
     const { url, markdownContent } = await request.json()
@@ -51,9 +88,77 @@ ${markdownContent}
 URL: ${url}
 `;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' })
+    console.log('Attempting to call Gemini API...')
     
-    const result = await model.generateContent(prompt)
+    // Test basic network connectivity first
+    try {
+      const testResponse = await fetchWithTimeout('https://httpbin.org/get', {}, 5000)
+      console.log('Basic network test successful:', testResponse.status)
+    } catch (testError) {
+      console.error('Basic network test failed:', testError)
+    }
+    
+    // Try direct fetch with timeout and retry logic
+    const apiKey = process.env.GEMINI_API_KEY
+    if (!apiKey) {
+      throw new Error('GEMINI_API_KEY environment variable is not set')
+    }
+    
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent`
+    
+    const requestBody = {
+      contents: [{
+        parts: [{
+          text: prompt
+        }]
+      }]
+    }
+    
+    console.log('Making direct fetch request to Gemini API with timeout...')
+    let result;
+    
+    try {
+      const response = await retryWithBackoff(async () => {
+        return await fetchWithTimeout(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': apiKey
+          },
+          body: JSON.stringify(requestBody)
+        }, 30000) // 30 second timeout
+      })
+      
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`)
+      }
+      
+      const responseData = await response.json()
+      console.log('Direct fetch successful')
+      result = { response: { text: () => responseData.candidates[0].content.parts[0].text } }
+    } catch (apiError: any) {
+      console.error('Direct fetch failed after retries:', apiError)
+      console.error('Error details:', {
+        message: apiError.message,
+        name: apiError.name,
+        stack: apiError.stack
+      })
+      
+      // Try using the SDK as fallback
+      console.log('Attempting fallback with Gemini SDK...')
+      try {
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-001" })
+        const sdkResult = await retryWithBackoff(async () => {
+          return await model.generateContent(prompt)
+        })
+        result = sdkResult
+        console.log('SDK fallback successful')
+      } catch (sdkError: any) {
+        console.error('SDK fallback also failed:', sdkError)
+        throw new Error(`Gemini API failed: ${apiError.message}. SDK fallback also failed: ${sdkError.message}`)
+      }
+    }
 
     let responseText = result.response?.text();
 
