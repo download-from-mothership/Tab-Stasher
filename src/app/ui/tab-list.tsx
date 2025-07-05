@@ -2,13 +2,15 @@
 
 import * as React from "react"
 import { useEffect, useState } from "react"
-import { SilkCard } from "@/app/ui/silk-card"
+import { Sheet } from "@silk-hq/components"
 import { Button } from "@/app/ui/button"
 import { ExternalLink, MoreVertical } from "lucide-react"
 import { Tab } from "@/lib/supabase"
 import { getTabs } from "@/lib/supabase"
 import { CategoryBadge } from "@/app/ui/category-badge"
 import { Card, CardContent, CardTitle } from "@/app/ui/card"
+import "@/styles/silk-card.css"
+import { SilkCard } from "@/app/ui/silk-card"
 
 interface TabListProps {
   refreshKey?: number
@@ -19,6 +21,7 @@ export function TabList({ refreshKey }: TabListProps) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    setIsLoading(true)
     const fetchTabs = async () => {
       try {
         const fetchedTabs = await getTabs()
@@ -55,7 +58,7 @@ export function TabList({ refreshKey }: TabListProps) {
         <SilkCard
           key={tab.id}
           presentTrigger={
-            <div className="w-[340px] h-[420px] flex flex-col justify-between bg-white rounded-lg shadow-md">
+            <div className="w-[340px] h-[420px] flex flex-col justify-between bg-white rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow">
               {tab.image && (
                 <div className="flex items-center justify-center py-6">
                   <div className="w-72 h-72 rounded-xl bg-gray-50 flex items-center justify-center overflow-hidden">
@@ -91,10 +94,6 @@ export function TabList({ refreshKey }: TabListProps) {
                 </div>
               </div>
               <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">{tab.url}</p>
-                {tab.description && (
-                  <p className="text-sm">{tab.description}</p>
-                )}
                 {tab.primary_category && (
                   <CategoryBadge
                     primaryCategory={tab.primary_category}
