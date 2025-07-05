@@ -5,11 +5,13 @@ import "@/styles/silk-card.css";
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
    presentTrigger: React.ReactNode;
    sheetContent: React.ReactNode;
+   presented?: boolean;
+   onPresentedChange?: (presented: boolean) => void;
 }
 
-const SilkCard = ({ presentTrigger, sheetContent, ...restProps }: Props) => {
+const SilkCard = ({ presentTrigger, sheetContent, presented, onPresentedChange, ...restProps }: Props) => {
    return (
-      <Sheet.Root license="commercial" {...restProps}>
+      <Sheet.Root license="commercial" presented={presented} onPresentedChange={onPresentedChange} {...restProps}>
          <Sheet.Trigger asChild>
             {presentTrigger}
          </Sheet.Trigger>

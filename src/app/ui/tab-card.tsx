@@ -44,7 +44,7 @@ export function TabCard({
           <img
             src={proxyFavicon}
             alt="favicon"
-            className="w-4 h-4"
+            className="w-6 h-6"
           />
         )}
         <h3 className="font-semibold leading-none tracking-tight">
@@ -52,7 +52,7 @@ export function TabCard({
         </h3>
       </div>
       {mainImage && (
-        <div className="relative w-full aspect-video overflow-hidden rounded-md">
+        <div className="relative w-full aspect-square overflow-hidden rounded-md">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={mainImage}

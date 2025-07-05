@@ -44,6 +44,18 @@ export function AddTabDialog({ onTabSaved }: AddTabDialogProps) {
   const [scrapedData, setScrapedData] = React.useState<ScrapedData | null>(null)
   const [tagInput, setTagInput] = React.useState("")
   const [customTags, setCustomTags] = React.useState<string[]>([])
+  const [open, setOpen] = React.useState(false)
+
+  // Reset state when dialog closes
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen)
+    if (!isOpen) {
+      setUrl("")
+      setScrapedData(null)
+      setCustomTags([])
+      setTagInput("")
+    }
+  }
 
   // Debug effect to log when scrapedData changes
   React.useEffect(() => {
@@ -151,12 +163,24 @@ export function AddTabDialog({ onTabSaved }: AddTabDialogProps) {
       }
 
       // Store processed data
+      let favicon = result.favicon;
+      if (!favicon || typeof favicon !== 'string' || favicon.trim() === '') {
+        try {
+          // Extract domain from URL
+          const urlObj = new URL(url);
+          const domain = urlObj.hostname;
+          favicon = `https://www.google.com/s2/favicons?domain=${domain}`;
+        } catch (e) {
+          // Fallback to a generic favicon if URL parsing fails
+          favicon = '/favicon.ico';
+        }
+      }
       const data: ScrapedData = {
         url,
         title: analysis?.title || result.title || 'Untitled',
         description: result.description,
         image: analysis?.image || result.image || result.metadata?.['og:image'] || null,
-        favicon: result.favicon,
+        favicon,
         content: result.content,
         tags: analysis?.tags || [],
         primaryCategory: analysis?.primaryCategory,
@@ -176,61 +200,47 @@ export function AddTabDialog({ onTabSaved }: AddTabDialogProps) {
   }
 
   const handleSave = async () => {
-    if (!scrapedData) return
-
+    if (!scrapedData) return;
+    setIsLoading(true);
     try {
-      setIsLoading(true)
-
-      // Store in Supabase
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        throw new Error('Not authenticated')
-      }
-
+      // Merge tags from analysis and custom input
+      const allTags = Array.from(new Set([...(scrapedData.tags || []), ...customTags]));
       const response = await fetch('/api/tabs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           url: scrapedData.url,
           title: scrapedData.title,
           description: scrapedData.description,
           image: scrapedData.image,
           favicon: scrapedData.favicon,
-          content: scrapedData.content, // Add the content field
-          tags: [...scrapedData.tags, ...customTags],
+          content: scrapedData.content,
+          tags: allTags,
           primaryCategory: scrapedData.primaryCategory,
           secondaryCategory: scrapedData.secondaryCategory,
           confidence: scrapedData.confidence
-        })
-      })
-
+        }),
+      });
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to save tab')
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to save tab');
       }
-
-      toast.success('Tab saved successfully')
-      setUrl('')
-      setScrapedData(null)
-      setCustomTags([])
-      
-      // Call the callback to refresh the dashboard
-      if (onTabSaved) {
-        onTabSaved()
-      }
-    } catch (error) {
-      console.error('Error:', error)
-      toast.error(error instanceof Error ? error.message : 'Failed to save tab')
+      toast.success('Tab saved!');
+      if (onTabSaved) onTabSaved();
+      setOpen(false);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to save tab');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <SilkCard
+      presented={open}
+      onPresentedChange={handleOpenChange}
       presentTrigger={
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-2" onClick={() => setOpen(true)}>
           <Plus className="h-4 w-4" />
           Add Tab
         </Button>
@@ -363,11 +373,6 @@ export function AddTabDialog({ onTabSaved }: AddTabDialogProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => {
-                    setUrl('')
-                    setScrapedData(null)
-                    setCustomTags([])
-                  }}
                 >
                   Cancel
                 </Button>

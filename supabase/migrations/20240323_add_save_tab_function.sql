@@ -15,7 +15,7 @@ AS $$
 DECLARE
     existing_tag RECORD;
     new_tag RECORD;
-    tag_id UUID;
+    new_tag_id UUID;
     tag_name TEXT;
 BEGIN
     -- Process each tag name
@@ -33,14 +33,14 @@ BEGIN
             VALUES (tag_name, p_user_id)
             RETURNING id INTO new_tag;
             
-            tag_id := new_tag.id;
+            new_tag_id := new_tag.id;
         ELSE
-            tag_id := existing_tag.id;
+            new_tag_id := existing_tag.id;
         END IF;
         
         -- Create tab-tag relationship (ignore if already exists)
         INSERT INTO public.tabs_tags (tab_id, tag_id)
-        VALUES (p_tab_id, tag_id)
+        VALUES (p_tab_id, new_tag_id)
         ON CONFLICT (tab_id, tag_id) DO NOTHING;
     END LOOP;
 END;
