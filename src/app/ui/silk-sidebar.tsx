@@ -10,7 +10,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 
 const SilkSidebar = ({ presentTrigger, sheetContent, ...restProps }: Props) => {
   return (
-    <Sheet.Root license="commercial" sheetRole="dialog" {...restProps}>
+    <Sheet.Root license="non-commercial" sheetRole="dialog" {...restProps}>
       {presentTrigger}
       <Sheet.Portal>
         <Sheet.View
@@ -22,9 +22,9 @@ const SilkSidebar = ({ presentTrigger, sheetContent, ...restProps }: Props) => {
           <Sheet.Backdrop />
           <Sheet.Content className="SilkSidebar-content">
             <VisuallyHidden.Root>
-              <Sheet.Title>Sidebar Example</Sheet.Title>
+              <Sheet.Title>Navigation Sidebar</Sheet.Title>
               <Sheet.Trigger action="dismiss">
-                Close Sidebar example
+                Close Navigation Sidebar
               </Sheet.Trigger>
             </VisuallyHidden.Root>
             {sheetContent}

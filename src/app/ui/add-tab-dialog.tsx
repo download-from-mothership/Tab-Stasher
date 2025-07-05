@@ -7,6 +7,7 @@ import { Plus, Loader2, X } from "lucide-react"
 import { toast } from "sonner"
 import { supabase } from "@/lib/supabase"
 import { SilkCard } from "@/app/ui/silk-card"
+import { Sheet } from "@silk-hq/components"
 
 // Tag colors for different categories
 const TAG_COLORS = {
@@ -23,11 +24,21 @@ const TAG_COLORS = {
 interface ScrapedData {
   url: string
   title: string
+  description?: string
   image: string | null
+  favicon?: string
+  content?: string
   tags: string[]
+  primaryCategory?: string
+  secondaryCategory?: string
+  confidence?: number
 }
 
-export function AddTabDialog() {
+interface AddTabDialogProps {
+  onTabSaved?: () => void
+}
+
+export function AddTabDialog({ onTabSaved }: AddTabDialogProps) {
   const [url, setUrl] = React.useState("")
   const [isLoading, setIsLoading] = React.useState(false)
   const [scrapedData, setScrapedData] = React.useState<ScrapedData | null>(null)
@@ -69,81 +80,69 @@ export function AddTabDialog() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setScrapedData(null);
+    e.preventDefault()
+    if (!url.trim()) return
 
+    setIsLoading(true)
     try {
-      // Step 1: Scrape the URL content and metadata using our secure API
-      const scrapeResponse = await fetch('/api/scrape-url', {
+      // Combine scraping and analysis into a single optimized call
+      const response = await fetch('/api/scrape-url', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url })
-      });
+        body: JSON.stringify({ url }),
+      })
 
-      if (!scrapeResponse.ok) {
-        const error = await scrapeResponse.json();
-        throw new Error(error.error || 'Failed to scrape URL');
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to process URL')
       }
 
-      const result = await scrapeResponse.json();
+      const result = await response.json()
+      console.log('Scrape result:', result)
 
-      if (result.error) {
-        toast.error(result.error);
-        setIsLoading(false);
-        return;
-      }
+      // If we have content, analyze it immediately
+      let analysis = null
+      if (result.content) {
+        try {
+          const analysisResponse = await fetch('/api/analyze-content', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              url, 
+              markdownContent: result.content 
+            }),
+          })
 
-      // Step 2: Use Gemini to analyze the content
-      const dataToSend = {
-        url: url,
-        markdownContent: result.content || '',
-      };
-      console.log('Sending to /api/analyze-content:', JSON.stringify(dataToSend, null, 2));
-      console.log('URL value:', url);
-      console.log('Markdown content value:', result.content);
-      
-      try {
-        const response = await fetch('/api/analyze-content', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(dataToSend),
-        });
-
-        console.log('Analyze content response status:', response.status);
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Analyze content error response:', errorData);
-          throw new Error(errorData.error || 'Failed to analyze content');
+          if (analysisResponse.ok) {
+            analysis = await analysisResponse.json()
+            console.log('Analysis result:', analysis)
+          }
+        } catch (error) {
+          console.warn('Analysis failed, using scraped data only:', error)
         }
-
-        const analysis = await response.json();
-        console.log('Analyze content success response:', analysis);
-
-        if (!analysis || !analysis.title || !Array.isArray(analysis.tags)) {
-          throw new Error('Invalid response from content analysis');
-        }
-
-        // Store processed data
-        const data: ScrapedData = {
-          url,
-          title: analysis.title || result.title || 'Untitled',
-          image: analysis.image || result.image || result.metadata?.['og:image'] || null,
-          tags: analysis.tags || []
-        };
-        setScrapedData(data);
-      } catch (error) {
-        console.error('Error in analyze-content API call:', error);
-        throw error; // Re-throw to be caught by the outer try-catch
       }
+
+      // Store processed data
+      const data: ScrapedData = {
+        url,
+        title: analysis?.title || result.title || 'Untitled',
+        description: result.description,
+        image: analysis?.image || result.image || result.metadata?.['og:image'] || null,
+        favicon: result.favicon,
+        content: result.content,
+        tags: analysis?.tags || [],
+        primaryCategory: analysis?.primaryCategory,
+        secondaryCategory: analysis?.secondaryCategory,
+        confidence: analysis?.confidence
+      }
+      setScrapedData(data)
     } catch (error) {
-      console.error('Error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to process URL');
+      console.error('Error:', error)
+      toast.error(error instanceof Error ? error.message : 'Failed to process URL')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleSave = async () => {
     if (!scrapedData) return
@@ -152,8 +151,8 @@ export function AddTabDialog() {
       setIsLoading(true)
 
       // Store in Supabase
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
         throw new Error('Not authenticated')
       }
 
@@ -164,19 +163,31 @@ export function AddTabDialog() {
         body: JSON.stringify({
           url: scrapedData.url,
           title: scrapedData.title,
+          description: scrapedData.description,
           image: scrapedData.image,
-          tags: [...scrapedData.tags, ...customTags]
+          favicon: scrapedData.favicon,
+          content: scrapedData.content, // Add the content field
+          tags: [...scrapedData.tags, ...customTags],
+          primaryCategory: scrapedData.primaryCategory,
+          secondaryCategory: scrapedData.secondaryCategory,
+          confidence: scrapedData.confidence
         })
       })
 
       if (!response.ok) {
-        throw new Error('Failed to save tab')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to save tab')
       }
 
       toast.success('Tab saved successfully')
       setUrl('')
       setScrapedData(null)
       setCustomTags([])
+      
+      // Call the callback to refresh the dashboard
+      if (onTabSaved) {
+        onTabSaved()
+      }
     } catch (error) {
       console.error('Error:', error)
       toast.error(error instanceof Error ? error.message : 'Failed to save tab')
@@ -236,6 +247,23 @@ export function AddTabDialog() {
                         <p className="text-sm text-muted-foreground truncate">
                           {scrapedData.url}
                         </p>
+                        {scrapedData.primaryCategory && (
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                              {scrapedData.primaryCategory}
+                            </span>
+                            {scrapedData.secondaryCategory && (
+                              <span className="inline-flex items-center rounded-full bg-secondary/10 px-2 py-1 text-xs font-medium text-secondary">
+                                {scrapedData.secondaryCategory}
+                              </span>
+                            )}
+                            {scrapedData.confidence && scrapedData.confidence < 0.8 && (
+                              <span className="text-xs text-muted-foreground">
+                                ({Math.round(scrapedData.confidence * 100)}% confidence)
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -294,17 +322,19 @@ export function AddTabDialog() {
             )}
 
             <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setUrl('')
-                  setScrapedData(null)
-                  setCustomTags([])
-                }}
-              >
-                Cancel
-              </Button>
+              <Sheet.Trigger action="dismiss" asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setUrl('')
+                    setScrapedData(null)
+                    setCustomTags([])
+                  }}
+                >
+                  Cancel
+                </Button>
+              </Sheet.Trigger>
               {!scrapedData ? (
                 <Button type="submit" disabled={isLoading}>
                   {isLoading ? 'Processing...' : 'Preview'}

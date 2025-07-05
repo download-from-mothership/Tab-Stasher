@@ -20,13 +20,18 @@ export async function POST(request: Request) {
       )
     }
 
-    const prompt = `Analyze the following Markdown content from the provided URL.
+    const prompt = `Analyze the following Markdown content from the provided URL and categorize it into a hierarchical structure.
 
 Extract a concise title (max 60 characters) that accurately represents the item described in the content.
 
 Identify a relevant image URL (if present) that is the primary image representing the item. If no suitable image URL is found, indicate "null".
 
-Generate 3-4 single-word tags that categorize the item and represent its key attributes. These tags should be general categories (e.g., "technology", "clothing", "furniture") or key features (e.g., "portable", "durable", "wireless"). All tags should be in lowercase.
+Categorize the content into a hierarchical structure:
+1. Primary category: Choose from these main categories: "clothing", "shoes", "homegoods", "electronics", "books", "food", "beauty", "sports", "automotive", "pets", "garden", "office", "toys", "health", "jewelry", "art", "music", "tools", "outdoor", "kitchen"
+2. Secondary category: Provide a specific subcategory (e.g., "dresses", "tops", "bottoms" for clothing; "heels", "flats", "sneakers" for shoes)
+3. Confidence score: Rate your confidence in the categorization (0.0 to 1.0)
+
+Generate 3-4 single-word tags that represent key attributes. These should be general categories or key features (e.g., "portable", "durable", "wireless"). All tags should be in lowercase.
 
 Respond with a JSON object in the following format:
 
@@ -34,12 +39,16 @@ Respond with a JSON object in the following format:
 {
   "title": "extracted title",
   "image": "image URL or null",
-  "tags": ["tag1", "tag2", "tag3"]
+  "tags": ["tag1", "tag2", "tag3"],
+  "primaryCategory": "clothing",
+  "secondaryCategory": "dresses",
+  "confidence": 0.92
 }
 \`\`\`
 
 Markdown Content:
 ${markdownContent}
+URL: ${url}
 `;
 
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' })
@@ -84,10 +93,21 @@ ${markdownContent}
         throw new Error('Invalid response format from Gemini');
       }
 
+      // Validate categorization fields
+      if (!analysis.primaryCategory || !analysis.secondaryCategory || typeof analysis.confidence !== 'number') {
+        console.warn('Missing categorization fields, using defaults');
+        analysis.primaryCategory = analysis.primaryCategory || 'uncategorized';
+        analysis.secondaryCategory = analysis.secondaryCategory || 'general';
+        analysis.confidence = analysis.confidence || 0.5;
+      }
+
       const responseData = {
         title: analysis.title,
         image: analysis.image,
-        tags: analysis.tags
+        tags: analysis.tags,
+        primaryCategory: analysis.primaryCategory,
+        secondaryCategory: analysis.secondaryCategory,
+        confidence: analysis.confidence
       };
 
       console.log('/api/analyze-content - Final response to frontend:', JSON.stringify(responseData, null, 2));  //  Log the final response

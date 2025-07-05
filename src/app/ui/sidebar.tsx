@@ -89,14 +89,20 @@ export function CustomSidebar({
   const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
+    // Get initial user securely
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user)
     })
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        // Verify the user securely
+        const { data: { user } } = await supabase.auth.getUser()
+        setUser(user)
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null)
+      }
     })
 
     return () => subscription.unsubscribe()

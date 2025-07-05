@@ -17,8 +17,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      router.refresh()
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // Only refresh on actual auth state changes, not on initial load
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+        router.refresh()
+      }
     })
 
     return () => {

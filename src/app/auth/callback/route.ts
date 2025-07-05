@@ -22,9 +22,13 @@ export async function GET(request: Request) {
       return NextResponse.redirect(new URL('/login', requestUrl.origin))
     }
 
-    // Get the session to verify it worked
-    const { data: { session } } = await supabase.auth.getSession()
-    console.log('Session after exchange:', session)
+    // Get the authenticated user to verify it worked
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    console.log('User after exchange:', user)
+    
+    if (userError) {
+      console.error('Error getting authenticated user:', userError)
+    }
   }
 
   // URL to redirect to after sign in process completes

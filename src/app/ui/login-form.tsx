@@ -59,23 +59,23 @@ export function LoginForm({
       // Show success message
       toast.success("Logged in successfully")
       
-      // Ensure session is established
-      const { data: { session } } = await supabase.auth.getSession()
-      console.log('Initial session check:', {
-        hasSession: !!session,
-        user: session?.user?.email
+      // Ensure user is authenticated
+      const { data: { user } } = await supabase.auth.getUser()
+      console.log('Initial user check:', {
+        hasUser: !!user,
+        user: user?.email
       })
 
-      if (!session) {
-        console.log('Waiting for session to be established...')
+      if (!user) {
+        console.log('Waiting for user to be authenticated...')
         await new Promise(resolve => setTimeout(resolve, 1000))
-        const { data: { session: retrySession } } = await supabase.auth.getSession()
-        console.log('Retry session check:', {
-          hasSession: !!retrySession,
-          user: retrySession?.user?.email
+        const { data: { user: retryUser } } = await supabase.auth.getUser()
+        console.log('Retry user check:', {
+          hasUser: !!retryUser,
+          user: retryUser?.email
         })
-        if (!retrySession) {
-          throw new Error('Failed to establish session')
+        if (!retryUser) {
+          throw new Error('Failed to authenticate user')
         }
       }
       
@@ -95,7 +95,7 @@ export function LoginForm({
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn("flex flex-col gap-6 w-full max-w-sm", className)} {...props}>
       <LoginCard>
         <LoginCardHeader className="text-center">
           <LoginCardTitle className="text-xl">Welcome back</LoginCardTitle>

@@ -6,10 +6,18 @@ import { AddTabDialog } from "@/app/ui/add-tab-dialog"
 import { Button } from "@/app/ui/button"
 import { AuthButton } from "@/app/ui/auth-button"
 import { TabList } from "@/app/ui/tab-list"
+import { CategoryDashboard } from "@/app/ui/category-dashboard"
+import { useState } from "react"
 
 export default function DashboardPage() {
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  const handleTabSaved = () => {
+    setRefreshKey(prev => prev + 1)
+  }
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-full">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex items-center p-4">
@@ -21,7 +29,7 @@ export default function DashboardPage() {
               {/* Add search functionality later */}
             </div>
             <nav className="flex items-center space-x-4">
-              <AddTabDialog />
+              <AddTabDialog onTabSaved={handleTabSaved} />
               <AuthButton />
             </nav>
           </div>
@@ -29,31 +37,42 @@ export default function DashboardPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 container py-6 md:py-8">
-        <div className="flex flex-col gap-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Your Tabs</h1>
-              <p className="text-muted-foreground">
-                View and manage your saved tabs
-              </p>
+      <main className="flex-1 overflow-y-auto">
+        <div className="container py-6 md:py-8">
+          <div className="flex flex-col gap-8">
+            <div className="flex items-center justify-between">
+              <div>
+                {/* Removed 'Your Tabs' heading and description */}
+              </div>
             </div>
-          </div>
-          
-          {/* Tabs Grid */}
-          <TabList />
+            
+            {/* Tabs Grid */}
+            <TabList refreshKey={refreshKey} />
 
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight">Your Tab Groups</h2>
-              <p className="text-muted-foreground">
-                Organize your tabs into collections
-              </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight">Your Tab Groups</h2>
+                <p className="text-muted-foreground">
+                  Organize your tabs into collections
+                </p>
+              </div>
             </div>
+            
+            {/* Tab Groups Grid */}
+            <TabGroups />
+
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight">Category Management</h2>
+                <p className="text-muted-foreground">
+                  Monitor and manage your tab categories
+                </p>
+              </div>
+            </div>
+            
+            {/* Category Dashboard */}
+            <CategoryDashboard />
           </div>
-          
-          {/* Tab Groups Grid */}
-          <TabGroups />
         </div>
       </main>
     </div>

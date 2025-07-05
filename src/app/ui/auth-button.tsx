@@ -15,6 +15,7 @@ import {
 } from "@/app/ui/dialog"
 import { Input } from "@/app/ui/input"
 import { Label } from "@/app/ui/label"
+import { useRouter } from "next/navigation"
 
 export function AuthButton() {
   const [isLoading, setIsLoading] = useState(false)
@@ -22,20 +23,24 @@ export function AuthButton() {
   const [isOpen, setIsOpen] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const router = useRouter()
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
+    // Get initial user securely
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user)
     })
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null)
-      if (event === 'SIGNED_IN') {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        // Verify the user securely
+        const { data: { user } } = await supabase.auth.getUser()
+        setUser(user)
         toast.success('Signed in successfully')
         setIsOpen(false) // Close the dialog on successful sign in
       } else if (event === 'SIGNED_OUT') {
+        setUser(null)
         toast.success('Signed out successfully')
       }
     })
@@ -86,56 +91,12 @@ export function AuthButton() {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          Sign In
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Sign In</DialogTitle>
-          <DialogDescription>
-            Sign in to your account to continue
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSignIn} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsOpen(false)}
-              disabled={isLoading}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign In'}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <Button
+      variant="outline"
+      onClick={() => router.push('/login')}
+      disabled={isLoading}
+    >
+      Sign In
+    </Button>
   )
 } 

@@ -36,13 +36,13 @@ export async function middleware(req: NextRequest) {
     }
   )
 
-  // Refresh session if expired - required for Server Components
-  const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+  // Get authenticated user - this is the secure way to check authentication
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
   
-  // Log detailed session information
-  console.log('Session check details:', {
-    hasSession: !!session,
-    sessionError: sessionError?.message,
+  // Log detailed authentication information
+  console.log('Authentication check details:', {
+    hasUser: !!user,
+    userError: userError?.message,
     cookies: {
       'sb-access-token': !!req.cookies.get('sb-access-token'),
       'sb-refresh-token': !!req.cookies.get('sb-refresh-token')
@@ -50,25 +50,11 @@ export async function middleware(req: NextRequest) {
     path: req.nextUrl.pathname
   })
   
-  if (session) {
-    console.log('Session details:', {
-      user: session.user.email,
-      expiresAt: new Date(session.expires_at! * 1000).toISOString(),
-      isExpired: Date.now() > session.expires_at! * 1000
+  if (user) {
+    console.log('User details:', {
+      user: user.email,
+      userId: user.id
     })
-
-    // If session is expired, try to refresh it
-    if (Date.now() > session.expires_at! * 1000) {
-      console.log('Session expired, attempting refresh')
-      const { data: { session: refreshedSession }, error: refreshError } = 
-        await supabase.auth.refreshSession()
-      
-      if (refreshError) {
-        console.error('Session refresh failed:', refreshError)
-      } else if (refreshedSession) {
-        console.log('Session refreshed successfully')
-      }
-    }
   }
 
   // Add CORS headers to all responses
@@ -91,16 +77,16 @@ export async function middleware(req: NextRequest) {
     return res
   }
 
-  // Redirect if accessing protected routes without session
-  if (isProtectedRoute && !session) {
-    console.log('Redirecting to login - no session for protected route')
+  // Redirect if accessing protected routes without authenticated user
+  if (isProtectedRoute && !user) {
+    console.log('Redirecting to login - no authenticated user for protected route')
     const redirectUrl = new URL('/login', req.url)
     return NextResponse.redirect(redirectUrl)
   }
 
-  // Redirect if accessing auth pages with session
-  if (isAuthPage && session) {
-    console.log('Redirecting to dashboard - session present on auth page')
+  // Redirect if accessing auth pages with authenticated user
+  if (isAuthPage && user) {
+    console.log('Redirecting to dashboard - authenticated user present on auth page')
     const redirectUrl = new URL('/dashboard', req.url)
     return NextResponse.redirect(redirectUrl)
   }

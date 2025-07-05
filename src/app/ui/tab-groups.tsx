@@ -37,7 +37,7 @@ export function TabGroups() {
     <div>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {/* Create New Group Card */}
-        <Card className="border-dashed">
+        <Card className="border-dashed w-full min-h-[340px] aspect-[9/10] bg-white rounded-lg shadow-md">
           <CardHeader>
             <CardTitle>Create New Group</CardTitle>
             <CardDescription>Save a new collection of tabs</CardDescription>
@@ -58,7 +58,7 @@ export function TabGroups() {
 
         {/* Existing Groups */}
         {groups.map((group) => (
-          <Card key={group.id} className="relative">
+          <Card key={group.id} className="relative w-full min-h-[340px] aspect-[9/10] bg-white rounded-lg shadow-md">
             <Button
               variant="ghost"
               size="icon"
