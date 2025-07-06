@@ -284,9 +284,11 @@ const SheetWithDepthView = ({
         if (!nativePageScrollReplaced) {
           animateDimmingOverlayOpacity({ keyframes: [0, 1] });
         }
-        animate(stackFirstSheetBackdropRef.current, {
-          opacity: [0, 0.33],
-        });
+        if (stackFirstSheetBackdropRef.current) {
+          animate(stackFirstSheetBackdropRef.current, {
+            opacity: [0, 0.33],
+          });
+        }
       }
 
       // * Animate on exiting
@@ -297,9 +299,11 @@ const SheetWithDepthView = ({
         if (!nativePageScrollReplaced) {
           animateDimmingOverlayOpacity({ keyframes: [1, 0] });
         }
-        animate(stackFirstSheetBackdropRef.current, {
-          opacity: [0.33, 0],
-        });
+        if (stackFirstSheetBackdropRef.current) {
+          animate(stackFirstSheetBackdropRef.current, {
+            opacity: [0.33, 0],
+          });
+        }
       }
 
       // * Store the state
