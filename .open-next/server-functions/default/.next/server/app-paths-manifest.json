@@ -1,0 +1,14 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/image-proxy/route": "app/api/image-proxy/route.js",
+  "/api/ocr-read/route": "app/api/ocr-read/route.js",
+  "/api/scrape-url/route": "app/api/scrape-url/route.js",
+  "/api/background-jobs/route": "app/api/background-jobs/route.js",
+  "/auth/callback/route": "app/auth/callback/route.js",
+  "/api/analyze-content/route": "app/api/analyze-content/route.js",
+  "/api/tabs/route": "app/api/tabs/route.js",
+  "/page": "app/page.js",
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/(auth)/signup/page": "app/(auth)/signup/page.js",
+  "/dashboard/page": "app/dashboard/page.js"
+}

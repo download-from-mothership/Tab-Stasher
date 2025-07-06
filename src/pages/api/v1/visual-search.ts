@@ -2,8 +2,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { v4 as uuid } from 'uuid';
 import { scheduleVisualSearch } from '../../../lib/visual-search-edge';
 
-export const runtime = 'edge'
-
 // Global type declaration
 declare global {
   var jobResults: Map<string, any> | undefined;

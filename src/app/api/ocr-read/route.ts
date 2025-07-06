@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'edge'
-
 async function runAzureOCR(url: string, azureEndpoint: string, azureKey: string) {
   const analyzeRes = await fetch(`${azureEndpoint}/vision/v3.2/read/analyze`, {
     method: 'POST',

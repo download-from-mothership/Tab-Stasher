@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { timeOperation } from '@/lib/performance-monitor'
 
-export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 

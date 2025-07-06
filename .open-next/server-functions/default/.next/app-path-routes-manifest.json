@@ -1,0 +1,14 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/api/image-proxy/route": "/api/image-proxy",
+  "/api/ocr-read/route": "/api/ocr-read",
+  "/api/scrape-url/route": "/api/scrape-url",
+  "/api/background-jobs/route": "/api/background-jobs",
+  "/auth/callback/route": "/auth/callback",
+  "/api/analyze-content/route": "/api/analyze-content",
+  "/api/tabs/route": "/api/tabs",
+  "/page": "/",
+  "/(auth)/login/page": "/login",
+  "/(auth)/signup/page": "/signup",
+  "/dashboard/page": "/dashboard"
+}

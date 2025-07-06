@@ -1,0 +1,1 @@
+"use strict";exports.id=743,exports.ids=[743],exports.modules={36743:(e,o,r)=>{r.d(o,{logger:()=>m,metrics:()=>a});var t=r(26211),s=r.n(t),n=r(55124);let a=new(s()),m=(0,n.createLogger)({level:process.env.LOG_LEVEL||"info",format:n.format.combine(n.format.timestamp(),n.format.json()),transports:[new n.transports.Console]})}};

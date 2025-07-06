@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server'
 
-export const runtime = 'edge'
-
 export async function POST(request: Request) {
   const { default: FireCrawlApp } = await import('@mendable/firecrawl-js')
   

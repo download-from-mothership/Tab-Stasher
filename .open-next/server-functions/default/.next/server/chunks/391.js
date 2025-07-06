@@ -1,0 +1,5 @@
+"use strict";exports.id=391,exports.ids=[391],exports.modules={16391:(a,e,t)=>{t.d(e,{getTabs:()=>n,supabase:()=>i});var s=t(59522),o=t(5475);let i=(0,s.createBrowserClient)(o.config.supabase.url,o.config.supabase.anonKey,{cookies:{get:a=>document.cookie.split("; ").find(e=>e.startsWith(`${a}=`))?.split("=")[1],set(a,e,t){document.cookie=`${a}=${e}${t.path?`; path=${t.path}`:""}${t.maxAge?`; max-age=${t.maxAge}`:""}${t.domain?`; domain=${t.domain}`:""}${t.secure?"; secure":""}`},remove(a,e){document.cookie=`${a}=; max-age=0${e.path?`; path=${e.path}`:""}${e.domain?`; domain=${e.domain}`:""}`}}});async function n(){let{data:a,error:e}=await i.from("tabs").select("*").order("created_at",{ascending:!1});if(e)throw e;return await Promise.all((a||[]).map(async a=>{let{data:e}=await i.from("tabs_tags").select(`
+          tags (
+            name
+          )
+        `).eq("tab_id",a.id),t=(e||[]).flatMap(a=>a.tags?.map(a=>a.name)??[]);return{...a,tags:t}}))}}};
