@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/ui/card"
-import { Button } from "@/app/ui/button"
-import { Badge } from "@/app/ui/badge"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { CategoryManager } from "@/lib/category-manager"
 import { Category } from "@/lib/supabase"
 import { AlertTriangle, TrendingUp, FolderOpen, Split } from "lucide-react"

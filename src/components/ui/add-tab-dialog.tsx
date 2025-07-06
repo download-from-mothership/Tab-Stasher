@@ -1,14 +1,14 @@
 "use client"
 
 import * as React from "react"
-import { Button } from "@/app/ui/button"
-import { Input } from "@/app/ui/input"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Plus, Loader2, X } from "lucide-react"
 import { toast } from "sonner"
 import { supabase } from "@/lib/supabase"
-import { SilkCard } from "@/app/ui/silk-card"
+import { SilkCard } from "@/components/ui/silk-card"
 import { Sheet } from "@silk-hq/components"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/app/ui/tabs"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 
 // Tag colors for different categories
 const TAG_COLORS = {

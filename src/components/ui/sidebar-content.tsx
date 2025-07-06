@@ -22,8 +22,8 @@ import {
   PlayCircle,
   LogOut,
 } from "lucide-react"
-import { Button } from "@/app/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { supabase } from "@/lib/supabase"
 import { useEffect, useState } from "react"
 import { User } from "@supabase/supabase-js"

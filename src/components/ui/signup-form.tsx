@@ -1,24 +1,23 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/app/ui/button"
+import { Button } from "@/components/ui/button"
 import {
-  LoginCard,
-  LoginCardContent,
-  LoginCardDescription,
-  LoginCardHeader,
-  LoginCardTitle,
-} from "@/app/ui/login-card"
-import { Input } from "@/app/ui/input"
-import { Label } from "@/app/ui/label"
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { createBrowserClient } from '@supabase/ssr'
+import { supabase } from "@/lib/supabase"
 import { toast } from "sonner"
-import { config } from "@/lib/config"
 
-export function LoginForm({
+export function SignUpForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
@@ -34,76 +33,46 @@ export function LoginForm({
     const formData = new FormData(event.currentTarget)
     const email = formData.get("email") as string
     const password = formData.get("password") as string
+    const confirmPassword = formData.get("confirmPassword") as string
 
     try {
-      const supabase = createBrowserClient(
-        config.supabase.url,
-        config.supabase.anonKey
-      )
+      if (password !== confirmPassword) {
+        throw new Error("Passwords do not match")
+      }
 
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`
+        }
       })
 
       if (error) {
-        console.error('Auth error:', error)
         throw error
       }
 
-      console.log('Sign in successful:', {
-        hasSession: !!data.session,
-        user: data.user?.email
-      })
-
-      // Show success message
-      toast.success("Logged in successfully")
-      
-      // Ensure user is authenticated
-      const { data: { user } } = await supabase.auth.getUser()
-      console.log('Initial user check:', {
-        hasUser: !!user,
-        user: user?.email
-      })
-
-      if (!user) {
-        console.log('Waiting for user to be authenticated...')
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        const { data: { user: retryUser } } = await supabase.auth.getUser()
-        console.log('Retry user check:', {
-          hasUser: !!retryUser,
-          user: retryUser?.email
-        })
-        if (!retryUser) {
-          throw new Error('Failed to authenticate user')
-        }
-      }
-      
-      // Refresh and redirect
-      router.refresh()
-      await new Promise(resolve => setTimeout(resolve, 100)) // Small delay to ensure refresh completes
-      router.replace('/dashboard')
-      
+      toast.success("Check your email to confirm your account")
+      router.push("/login")
     } catch (err) {
-      console.error("Login error:", err)
-      const errorMessage = err instanceof Error ? err.message : "Failed to login"
-      setError(errorMessage)
-      toast.error(errorMessage)
+      console.error("Signup error:", err)
+      setError(err instanceof Error ? err.message : "Failed to sign up")
+      toast.error(err instanceof Error ? err.message : "Failed to sign up")
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className={cn("flex flex-col gap-6 w-full max-w-sm", className)} {...props}>
-      <LoginCard>
-        <LoginCardHeader className="text-center">
-          <LoginCardTitle className="text-xl">Welcome back</LoginCardTitle>
-          <LoginCardDescription>
-            Login with your Apple or Google account
-          </LoginCardDescription>
-        </LoginCardHeader>
-        <LoginCardContent>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <Card>
+        <CardHeader className="text-center">
+          <CardTitle className="text-xl">Create an account</CardTitle>
+          <CardDescription>
+            Sign up with your Apple or Google account
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
           <form onSubmit={onSubmit}>
             <div className="grid gap-6">
               <div className="flex flex-col gap-4">
@@ -118,7 +87,7 @@ export function LoginForm({
                       fill="currentColor"
                     />
                   </svg>
-                  Login with Apple
+                  Sign up with Apple
                 </Button>
                 <Button type="button" variant="outline" className="w-full relative pl-8">
                   <svg 
@@ -131,7 +100,7 @@ export function LoginForm({
                       fill="currentColor"
                     />
                   </svg>
-                  Login with Google
+                  Sign up with Google
                 </Button>
               </div>
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
@@ -152,18 +121,20 @@ export function LoginForm({
                   />
                 </div>
                 <div className="grid gap-2">
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Password</Label>
-                    <Link
-                      href="#"
-                      className="ml-auto text-sm underline-offset-4 hover:underline"
-                    >
-                      Forgot your password?
-                    </Link>
-                  </div>
+                  <Label htmlFor="password">Password</Label>
                   <Input 
                     id="password" 
                     name="password"
+                    type="password" 
+                    required 
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Input 
+                    id="confirmPassword" 
+                    name="confirmPassword"
                     type="password" 
                     required 
                     disabled={isLoading}
@@ -175,23 +146,23 @@ export function LoginForm({
                   </div>
                 )}
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Logging in..." : "Login"}
+                  {isLoading ? "Creating account..." : "Create account"}
                 </Button>
               </div>
               <div className="text-center text-sm">
-                Don&apos;t have an account?{" "}
-                <Link href="/signup" className="underline underline-offset-4">
-                  Sign up
+                Already have an account?{" "}
+                <Link href="/login" className="underline underline-offset-4">
+                  Login
                 </Link>
               </div>
             </div>
           </form>
-        </LoginCardContent>
-      </LoginCard>
+        </CardContent>
+      </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
         By clicking continue, you agree to our <Link href="#">Terms of Service</Link>{" "}
         and <Link href="#">Privacy Policy</Link>.
       </div>
     </div>
   )
-}
+} 

@@ -1,7 +1,7 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/ui/card"
-import { Button } from "@/app/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Globe, MoreVertical, Plus } from "lucide-react"
 import { useState } from "react"
 

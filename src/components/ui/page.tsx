@@ -26,4 +26,4 @@ const Page = ({ presentTrigger, sheetContent, ...restProps }: Props) => {
    );
 };
 
-export { Page }; 
+export default Page; 

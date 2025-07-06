@@ -3,14 +3,14 @@
 import * as React from "react"
 import { useEffect, useState } from "react"
 import { Sheet } from "@silk-hq/components"
-import { Button } from "@/app/ui/button"
+import { Button } from "@/components/ui/button"
 import { ExternalLink, MoreVertical } from "lucide-react"
 import { Tab } from "@/lib/supabase"
 import { getTabs } from "@/lib/supabase"
-import { CategoryBadge } from "@/app/ui/category-badge"
-import { Card, CardContent, CardTitle } from "@/app/ui/card"
+import { CategoryBadge } from "@/components/ui/category-badge"
+import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import "@/styles/silk-card.css"
-import { SilkCard } from "@/app/ui/silk-card"
+import { SilkCard } from "@/components/ui/silk-card"
 
 interface TabListProps {
   refreshKey?: number

@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from "@/app/ui/button"
+import { Button } from "@/components/ui/button"
 import { supabase } from "@/lib/supabase"
 import { useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -12,9 +12,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/app/ui/dialog"
-import { Input } from "@/app/ui/input"
-import { Label } from "@/app/ui/label"
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation"
 
 export function AuthButton() {

@@ -1,12 +1,12 @@
 "use client"
 
 import { GalleryVerticalEnd } from "lucide-react"
-import { TabGroups } from "@/app/ui/tab-groups"
-import { AddTabDialog } from "@/app/ui/add-tab-dialog"
-import { Button } from "@/app/ui/button"
-import { AuthButton } from "@/app/ui/auth-button"
-import { TabList } from "@/app/ui/tab-list"
-import { CategoryDashboard } from "@/app/ui/category-dashboard"
+import { TabGroups } from "@/components/ui/tab-groups"
+import { AddTabDialog } from "@/components/ui/add-tab-dialog"
+import { Button } from "@/components/ui/button"
+import { AuthButton } from "@/components/ui/auth-button"
+import { TabList } from "@/components/ui/tab-list"
+import { CategoryDashboard } from "@/components/ui/category-dashboard"
 import { useState } from "react"
 
 export default function DashboardPage() {

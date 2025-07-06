@@ -2,8 +2,8 @@
 
 import * as React from "react"
 import Image from "next/image"
-import { Card, CardContent, CardHeader, CardTitle } from "@/app/ui/card"
-import { Button } from "@/app/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
