@@ -12,7 +12,10 @@ import { metrics, logger } from './observability';
 const gcs    = new Storage();
 const bucket = gcs.bucket(config.gcs.bucket);
 const redis  = new Redis(config.redis.url);
-const vision = new ImageAnnotatorClient({ keyFilename: config.vision.keyFilePath });
+const vision = new ImageAnnotatorClient({ 
+  apiKey: config.vision.apiKey || undefined,
+  keyFilename: config.vision.keyFilePath || undefined
+});
 
 ///////////////////////
 // Types & Constants //
