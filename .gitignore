@@ -88,4 +88,7 @@ logs
 # Cache directories
 .cache/
 .temp/
-.tmp/ 
+.tmp/
+
+# Google Cloud SDK (too large for git)
+google-cloud-sdk/ 
