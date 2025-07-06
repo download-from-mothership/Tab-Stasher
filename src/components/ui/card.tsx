@@ -3,11 +3,21 @@ import { Sheet } from "@silk-hq/components";
 import "@/styles/silk-card.css";
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
-   presentTrigger: React.ReactNode;
-   sheetContent: React.ReactNode;
+   presentTrigger?: React.ReactNode;
+   sheetContent?: React.ReactNode;
 }
 
-const Card = ({ presentTrigger, sheetContent, ...restProps }: Props) => {
+const Card = ({ presentTrigger, sheetContent, children, ...restProps }: Props) => {
+   // If no presentTrigger or sheetContent is provided, render as a regular card
+   if (!presentTrigger || !sheetContent) {
+      return (
+         <div className="rounded-lg border bg-card text-card-foreground shadow-sm" {...restProps}>
+            {children}
+         </div>
+      );
+   }
+
+   // Otherwise, render as a Sheet-based card
    return (
       <Sheet.Root license="commercial" {...restProps}>
          {presentTrigger}
