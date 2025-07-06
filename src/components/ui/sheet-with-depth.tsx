@@ -23,8 +23,8 @@ import "@/styles/sheet-with-depth.css";
 const sheetWithDepthStackId = "sheet-with-depth-stack";
 
 interface SheetWithDepthStackContextValue {
-  stackBackgroundRef: React.RefObject<HTMLElement | null>;
-  stackFirstSheetBackdropRef: React.RefObject<HTMLElement | null>;
+  stackBackgroundRef: React.RefObject<HTMLDivElement>;
+  stackFirstSheetBackdropRef: React.RefObject<HTMLDivElement>;
   iOSStandalone: boolean;
   nativePageScrollReplaced: boolean;
   stackingCount: number;
@@ -45,8 +45,8 @@ const SheetWithDepthStackContext = React.createContext<SheetWithDepthStackContex
 // useful data
 
 const SheetWithDepthStack = ({ children, ...restProps }: any) => {
-  const stackBackgroundRef = useRef<HTMLElement | null>(null);
-  const stackFirstSheetBackdropRef = useRef<HTMLElement | null>(null);
+  const stackBackgroundRef = useRef<HTMLDivElement>(null);
+  const stackFirstSheetBackdropRef = useRef<HTMLDivElement>(null);
 
   //
   // Check if we are in iOS standalone mode
