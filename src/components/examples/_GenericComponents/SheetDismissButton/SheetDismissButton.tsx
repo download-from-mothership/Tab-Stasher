@@ -3,8 +3,9 @@ import React from "react";
 import { Sheet } from "@silk-hq/components";
 import { cn } from "@/lib/utils";
 
-interface SheetDismissButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
+interface SheetDismissButtonProps extends Omit<React.HTMLAttributes<HTMLButtonElement>, 'onClick'> {
   variant?: "simple" | "icon";
+  onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 export const SheetDismissButton = React.forwardRef<
