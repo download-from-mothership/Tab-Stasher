@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server'
 import FireCrawlApp from '@mendable/firecrawl-js'
 
-if (!process.env.FIRECRAWL_API_KEY) {
-  throw new Error('Missing FIRECRAWL_API_KEY environment variable')
-}
-
-const app = new FireCrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY })
-
 export async function POST(request: Request) {
+  const apiKey = process.env.FIRECRAWL_API_KEY
+  if (!apiKey) {
+    return NextResponse.json(
+      { error: 'FIRECRAWL_API_KEY environment variable is not configured' },
+      { status: 500 }
+    )
+  }
+
+  const app = new FireCrawlApp({ apiKey })
+
   try {
     const { url } = await request.json()
 
