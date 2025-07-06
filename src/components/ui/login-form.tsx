@@ -14,9 +14,7 @@ import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { createBrowserClient } from '@supabase/ssr'
 import { toast } from "sonner"
-import { config } from "@/lib/config"
 
 export function LoginForm({
   className,
@@ -36,6 +34,9 @@ export function LoginForm({
     const password = formData.get("password") as string
 
     try {
+      const { createBrowserClient } = await import('@supabase/ssr')
+      const { config } = await import('@/lib/config')
+      
       const supabase = createBrowserClient(
         config.supabase.url,
         config.supabase.anonKey

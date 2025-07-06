@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = 'force-dynamic'
+
 import { GalleryVerticalEnd } from "lucide-react"
 import { TabGroups } from "@/components/ui/tab-groups"
 import { AddTabDialog } from "@/components/ui/add-tab-dialog"

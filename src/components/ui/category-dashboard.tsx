@@ -4,9 +4,20 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CategoryManager } from "@/lib/category-manager"
-import { Category } from "@/lib/supabase"
 import { AlertTriangle, TrendingUp, FolderOpen, Split } from "lucide-react"
+
+// Define Category type locally to avoid importing from supabase
+interface Category {
+  id: string
+  name: string
+  parent_id: string | null
+  level: number
+  tab_count: number
+  max_tabs_before_split: number
+  user_id: string
+  created_at: string
+  updated_at: string
+}
 
 interface CategoryStats {
   totalCategories: number
@@ -27,6 +38,7 @@ export function CategoryDashboard() {
     try {
       setIsLoading(true)
       setError(null)
+      const { CategoryManager } = await import('@/lib/category-manager')
       const categoryManager = new CategoryManager()
       const categoryStats = await categoryManager.getCategoryStats()
       setStats(categoryStats)
@@ -39,6 +51,7 @@ export function CategoryDashboard() {
 
   const handleManualSplit = async (category: Category) => {
     try {
+      const { CategoryManager } = await import('@/lib/category-manager')
       const categoryManager = new CategoryManager()
       const result = await categoryManager.checkAndSplitCategory(category, '')
       

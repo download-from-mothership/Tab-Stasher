@@ -14,7 +14,6 @@ import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { supabase } from "@/lib/supabase"
 import { toast } from "sonner"
 
 export function SignUpForm({
@@ -40,6 +39,7 @@ export function SignUpForm({
         throw new Error("Passwords do not match")
       }
 
+      const { supabase } = await import('@/lib/supabase')
       const { data, error } = await supabase.auth.signUp({
         email,
         password,

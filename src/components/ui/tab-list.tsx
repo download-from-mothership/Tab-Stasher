@@ -5,8 +5,6 @@ import { useEffect, useState } from "react"
 import { Sheet } from "@silk-hq/components"
 import { Button } from "@/components/ui/button"
 import { ExternalLink, MoreVertical } from "lucide-react"
-import { Tab } from "@/lib/supabase"
-import { getTabs } from "@/lib/supabase"
 import { CategoryBadge } from "@/components/ui/category-badge"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import "@/styles/silk-card.css"
@@ -14,6 +12,24 @@ import { SilkCard } from "@/components/ui/silk-card"
 
 interface TabListProps {
   refreshKey?: number
+}
+
+// Define Tab type locally to avoid importing from supabase
+interface Tab {
+  id: string
+  url: string
+  title: string | null
+  description: string | null
+  image: string | null
+  favicon: string | null
+  content: string | null
+  created_at: string
+  user_id: string | null
+  tags: string[]
+  primary_category: string | null
+  secondary_category: string | null
+  category_confidence: number | null
+  auto_categorized_at: string | null
 }
 
 export function TabList({ refreshKey }: TabListProps) {
@@ -24,6 +40,7 @@ export function TabList({ refreshKey }: TabListProps) {
     setIsLoading(true)
     const fetchTabs = async () => {
       try {
+        const { getTabs } = await import('@/lib/supabase')
         const fetchedTabs = await getTabs()
         setTabs(fetchedTabs)
       } catch (error) {

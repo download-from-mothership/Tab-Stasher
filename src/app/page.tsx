@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic'
+
 import { AuthButton } from "@/components/ui/auth-button"
 
 export default function Home() {

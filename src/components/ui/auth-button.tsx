@@ -1,7 +1,6 @@
 'use client'
 
 import { Button } from "@/components/ui/button"
-import { supabase } from "@/lib/supabase"
 import { useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
 import { User } from '@supabase/supabase-js'
@@ -26,32 +25,39 @@ export function AuthButton() {
   const router = useRouter()
 
   useEffect(() => {
-    // Get initial user securely
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
-    })
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        // Verify the user securely
-        const { data: { user } } = await supabase.auth.getUser()
+    const initializeAuth = async () => {
+      const { supabase } = await import('@/lib/supabase')
+      
+      // Get initial user securely
+      supabase.auth.getUser().then(({ data: { user } }) => {
         setUser(user)
-        toast.success('Signed in successfully')
-        setIsOpen(false) // Close the dialog on successful sign in
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null)
-        toast.success('Signed out successfully')
-      }
-    })
+      })
 
-    return () => subscription.unsubscribe()
+      // Listen for auth changes
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          // Verify the user securely
+          const { data: { user } } = await supabase.auth.getUser()
+          setUser(user)
+          toast.success('Signed in successfully')
+          setIsOpen(false) // Close the dialog on successful sign in
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null)
+          toast.success('Signed out successfully')
+        }
+      })
+
+      return () => subscription.unsubscribe()
+    }
+
+    initializeAuth()
   }, [])
 
   const handleSignIn = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     try {
       setIsLoading(true)
+      const { supabase } = await import('@/lib/supabase')
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -68,6 +74,7 @@ export function AuthButton() {
   const handleSignOut = useCallback(async () => {
     try {
       setIsLoading(true)
+      const { supabase } = await import('@/lib/supabase')
       const { error } = await supabase.auth.signOut()
       if (error) throw error
     } catch (error) {
