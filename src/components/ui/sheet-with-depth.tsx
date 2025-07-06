@@ -331,10 +331,12 @@ const SheetWithDepthView = ({
         if (!nativePageScrollReplaced) {
           setDimmingOverlayOpacity(progress);
         }
-        stackFirstSheetBackdropRef.current.style.setProperty(
-          "opacity",
-          (progress * 0.33) as unknown as string
-        );
+        if (stackFirstSheetBackdropRef.current) {
+          stackFirstSheetBackdropRef.current.style.setProperty(
+            "opacity",
+            `${progress * 0.33}`
+          );
+        }
       };
     } else return undefined;
   }, [
