@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     if (req.method !== 'GET') {
-      metrics.increment('http.request_error', 1, { route: req.url, method: req.method });
+      metrics.increment('http.request_error', 1, [`route:${req.url}`, `method:${req.method}`]);
       logger.warn('PollInvalidMethod', { method: req.method });
       res.status(405).json({ error: 'Method not allowed' });
       return;
@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const data = await redis.hgetall(`job:${jobId}`);
     if (!data || !data.status) {
-      metrics.increment('http.request_error', 1, { step: 'job_not_found' });
+      metrics.increment('http.request_error', 1, ['step:job_not_found']);
       logger.warn('JobNotFound', { jobId });
       res.status(404).json({ error: 'Job not found' });
       return;
@@ -48,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
     logger.info('PollJobSuccess', { jobId, matchUrl: data.matchUrl });
   } catch (err: any) {
-    metrics.increment('http.request_error', 1, { step: 'poll_exception' });
+    metrics.increment('http.request_error', 1, ['step:poll_exception']);
     logger.error('PollException', { jobId, error: err.message });
     res.status(500).json({ error: 'Internal server error' });
   } finally {
