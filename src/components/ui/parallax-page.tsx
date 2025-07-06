@@ -124,8 +124,8 @@ const ParallaxPage = ({
   return (
     <Sheet.Root
       license="commercial"
-      componentId={parallaxPageId}
-      forComponent={stackId}
+      componentId={parallaxPageId as unknown as React.Context<any>}
+      forComponent={stackId as unknown as React.Context<any>}
       {...restProps}
     >
       {presentTrigger}
