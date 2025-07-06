@@ -1,17 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const AZURE_ENDPOINT = process.env.AZURE_COMPUTER_VISION_ENDPOINT;
-const AZURE_KEY = process.env.AZURE_COMPUTER_VISION_KEY;
-const GOOGLE_VISION_API_KEY = process.env.GOOGLE_VISION_API_KEY;
-
-async function runAzureOCR(url: string) {
-  if (!AZURE_ENDPOINT || !AZURE_KEY) {
-    throw new Error('Azure Computer Vision credentials not set');
-  }
-  const analyzeRes = await fetch(`${AZURE_ENDPOINT}/vision/v3.2/read/analyze`, {
+async function runAzureOCR(url: string, azureEndpoint: string, azureKey: string) {
+  const analyzeRes = await fetch(`${azureEndpoint}/vision/v3.2/read/analyze`, {
     method: 'POST',
     headers: {
-      'Ocp-Apim-Subscription-Key': AZURE_KEY,
+      'Ocp-Apim-Subscription-Key': azureKey,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ url }),
@@ -29,7 +22,7 @@ async function runAzureOCR(url: string) {
   do {
     await new Promise(res => setTimeout(res, 1000));
     const pollRes = await fetch(operationLocation, {
-      headers: { 'Ocp-Apim-Subscription-Key': AZURE_KEY },
+      headers: { 'Ocp-Apim-Subscription-Key': azureKey },
     });
     result = await pollRes.json();
     status = result.status;
@@ -46,11 +39,8 @@ async function runAzureOCR(url: string) {
   return lines;
 }
 
-async function runGoogleWebDetection(base64: string) {
-  if (!GOOGLE_VISION_API_KEY) {
-    throw new Error('Google Vision API key not set');
-  }
-  const apiUrl = `https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`;
+async function runGoogleWebDetection(base64: string, googleVisionApiKey: string) {
+  const apiUrl = `https://vision.googleapis.com/v1/images:annotate?key=${googleVisionApiKey}`;
   const body = {
     requests: [
       {
@@ -113,22 +103,33 @@ export async function POST(req: NextRequest) {
     if (!url && !base64) {
       return NextResponse.json({ error: 'Missing url or base64 image' }, { status: 400 });
     }
+    
+    const azureEndpoint = process.env.AZURE_COMPUTER_VISION_ENDPOINT;
+    const azureKey = process.env.AZURE_COMPUTER_VISION_KEY;
+    const googleVisionApiKey = process.env.GOOGLE_VISION_API_KEY;
+    
     let ocrText = null;
     let webDetection = null;
     let bestMatch = null;
     const promises = [];
-    if (url) {
+    
+    if (url && azureEndpoint && azureKey) {
       promises.push(
-        runAzureOCR(url).then(text => { ocrText = text; }).catch(e => { ocrText = { error: e.message }; })
+        runAzureOCR(url, azureEndpoint, azureKey).then(text => { ocrText = text; }).catch(e => { ocrText = { error: e.message }; })
       );
+    } else if (url) {
+      ocrText = { error: 'Azure Computer Vision credentials not configured' };
     }
-    if (base64) {
+    
+    if (base64 && googleVisionApiKey) {
       promises.push(
-        runGoogleWebDetection(base64).then(res => {
+        runGoogleWebDetection(base64, googleVisionApiKey).then(res => {
           webDetection = res;
           bestMatch = pickBestWebDetectionMatch(res);
         }).catch(e => { webDetection = { error: e.message }; bestMatch = null; })
       );
+    } else if (base64) {
+      webDetection = { error: 'Google Vision API key not configured' };
     }
     await Promise.all(promises);
     return NextResponse.json({ ocrText, webDetection, bestMatch });

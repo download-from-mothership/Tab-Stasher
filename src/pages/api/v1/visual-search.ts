@@ -4,8 +4,6 @@ import { v4 as uuid } from 'uuid';
 import fs from 'fs/promises';
 import fsSync from 'fs';
 import { scheduleVisualSearch } from '../../../lib/visual-search';
-import { metrics, logger } from '../../../lib/observability';
-import { config } from '../../../lib/config';
 
 // Global type declaration
 declare global {
@@ -27,6 +25,7 @@ if (typeof global.jobResults === 'undefined') {
 const jobResults = global.jobResults;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { metrics, logger } = await import('../../../lib/observability');
   const startTime = Date.now();
   logger.info('APIRequestStart', { route: req.url, method: req.method });
 
@@ -92,7 +91,8 @@ async function processImageSearch(jobId: string, imagePath: string) {
     console.log(`Image converted to base64, size: ${base64.length} characters`);
     
     // Use the existing OCR/web detection API
-    const apiUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/ocr-read`;
+    const nextAuthUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+    const apiUrl = `${nextAuthUrl}/api/ocr-read`;
     console.log(`Calling OCR API: ${apiUrl}`);
     
     const response = await fetch(apiUrl, {

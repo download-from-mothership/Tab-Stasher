@@ -1,12 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { NextResponse } from 'next/server'
 
-if (!process.env.GEMINI_API_KEY) {
-  throw new Error('Missing GEMINI_API_KEY environment variable')
-}
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-
 export const dynamic = 'force-dynamic'
 
 // Helper function to create a fetch with timeout
@@ -47,6 +41,16 @@ async function retryWithBackoff<T>(
 }
 
 export async function POST(request: Request) {
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) {
+    return NextResponse.json(
+      { error: 'GEMINI_API_KEY environment variable is not configured' },
+      { status: 500 }
+    )
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey)
+
   try {
     const { url, markdownContent } = await request.json()
 
@@ -99,10 +103,6 @@ URL: ${url}
     }
     
     // Try direct fetch with timeout and retry logic
-    const apiKey = process.env.GEMINI_API_KEY
-    if (!apiKey) {
-      throw new Error('GEMINI_API_KEY environment variable is not set')
-    }
     
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent`
     
