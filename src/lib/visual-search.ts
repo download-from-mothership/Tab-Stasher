@@ -47,13 +47,13 @@ export async function scheduleVisualSearch(jobId: string, imageBuffer: Buffer) {
     // 1️⃣ Upload → GCS
     const start1 = Date.now();
     await bucket.file(`screenshots/${jobId}.png`).save(imageBuffer, { contentType: 'image/png', resumable: false });
-    metrics.timing('visual_search.step_duration', Date.now() - start1, { tags: { step: 'gcs_upload' } });
+    metrics.timing('visual_search.step_duration', Date.now() - start1, ['step:gcs_upload']);
 
     // 2️⃣ Hash & cache lookup
     const start2 = Date.now();
     const hash = crypto.createHash('sha256').update(imageBuffer).digest('hex');
     const cached = await redis.hgetall(hashKey(hash));
-    metrics.timing('visual_search.step_duration', Date.now() - start2, { tags: { step: 'cache_lookup' } });
+    metrics.timing('visual_search.step_duration', Date.now() - start2, ['step:cache_lookup']);
     if (cached && cached.matchUrl) {
       logger.info('CacheHit', { jobId, hash });
       await redis.hmset(jobKey(jobId), { status: 'done', ...cached });
@@ -68,12 +68,12 @@ export async function scheduleVisualSearch(jobId: string, imageBuffer: Buffer) {
       image: { content: imageBuffer },
       features: [{ type: 'WEB_DETECTION', maxResults: 10 }],
     });
-    metrics.timing('visual_search.step_duration', Date.now() - start3, { tags: { step: 'vision_call' } });
+    metrics.timing('visual_search.step_duration', Date.now() - start3, ['step:vision_call']);
 
     // 4️⃣ Filter & rank
     const start4 = Date.now();
     const best = selectBestCandidate(visionResponse.webDetection?.pagesWithMatchingImages || []);
-    metrics.timing('visual_search.step_duration', Date.now() - start4, { tags: { step: 'filter_rank' } });
+    metrics.timing('visual_search.step_duration', Date.now() - start4, ['step:filter_rank']);
 
     // 5️⃣ Cache result
     const start5 = Date.now();
@@ -89,7 +89,7 @@ export async function scheduleVisualSearch(jobId: string, imageBuffer: Buffer) {
     }
     await redis.hmset(hashKey(hash), cachePayload);
     await redis.expire(hashKey(hash), CACHE_TTL);
-    metrics.timing('visual_search.step_duration', Date.now() - start5, { tags: { step: 'cache_write' } });
+    metrics.timing('visual_search.step_duration', Date.now() - start5, ['step:cache_write']);
 
     // 6️⃣ Job status write
     const start6 = Date.now();
@@ -98,7 +98,7 @@ export async function scheduleVisualSearch(jobId: string, imageBuffer: Buffer) {
       : { status: 'done', matchUrl: null };
     await redis.hmset(jobKey(jobId), jobPayload as any);
     await redis.expire(jobKey(jobId), JOB_TTL);
-    metrics.timing('visual_search.step_duration', Date.now() - start6, { tags: { step: 'job_write' } });
+    metrics.timing('visual_search.step_duration', Date.now() - start6, ['step:job_write']);
 
     logger.info('JobSuccess', { jobId, matchUrl: best.matchUrl, confidence: (best as any).confidence });
   } catch (err: any) {
