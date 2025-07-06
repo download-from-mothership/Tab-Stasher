@@ -31,7 +31,14 @@ interface SheetWithDepthStackContextValue {
   setStackingCount: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const SheetWithDepthStackContext = React.createContext<SheetWithDepthStackContextValue | null>(null);
+const SheetWithDepthStackContext = React.createContext<SheetWithDepthStackContextValue>({
+  stackBackgroundRef: { current: null },
+  stackFirstSheetBackdropRef: { current: null },
+  iOSStandalone: false,
+  nativePageScrollReplaced: false,
+  stackingCount: 0,
+  setStackingCount: () => {},
+});
 
 //
 // The SheetStack Root sub-component and a context pasing down
