@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { CategoryManager } from '@/lib/category-manager'
 
 export const dynamic = 'force-dynamic'
 
@@ -56,6 +55,7 @@ export async function POST(request: Request) {
       )
     }
 
+    const { CategoryManager } = await import('@/lib/category-manager')
     const categoryManager = new CategoryManager()
 
     switch (jobType) {
