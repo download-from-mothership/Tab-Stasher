@@ -16,7 +16,7 @@ interface ParallaxPageStackContextValue {
 }
 
 const ParallaxPageStackContext = React.createContext<ParallaxPageStackContextValue>({
-  stackId: 'default',
+  stackId: 'default' as ComponentId,
   pageContainer: null,
   menuTitleContainer: null,
   menuLeftContainer: null,
