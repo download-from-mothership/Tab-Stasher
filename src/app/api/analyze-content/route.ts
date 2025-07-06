@@ -1,4 +1,3 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -41,6 +40,8 @@ async function retryWithBackoff<T>(
 }
 
 export async function POST(request: Request) {
+  const { GoogleGenerativeAI } = await import('@google/generative-ai')
+  
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
     return NextResponse.json(

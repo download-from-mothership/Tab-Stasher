@@ -1,14 +1,12 @@
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { CategoryManager } from '@/lib/category-manager'
 
 export const dynamic = 'force-dynamic'
 
-// Create Supabase client
-const cookieStore = cookies()
-
 export async function POST(request: Request) {
+  const { createServerClient } = await import('@supabase/ssr')
+  const { cookies } = await import('next/headers')
+  
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   
@@ -19,6 +17,7 @@ export async function POST(request: Request) {
     )
   }
 
+  const cookieStore = cookies()
   const supabase = createServerClient(
     supabaseUrl,
     supabaseAnonKey,

@@ -1,11 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import Redis from 'ioredis';
-import { metrics, logger } from '../../../../lib/observability';
-import { config } from '../../../../lib/config';
-
-const redis = new Redis(config.redis.url);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const Redis = (await import('ioredis')).default;
+  const { metrics, logger } = await import('../../../../lib/observability');
+  const { config } = await import('../../../../lib/config');
+  
+  const redisUrl = process.env.REDIS_URL;
+  if (!redisUrl) {
+    return res.status(500).json({ error: 'Redis configuration is not complete' });
+  }
+  
+  const redis = new Redis(redisUrl);
+  
   const { jobId } = req.query as { jobId: string };
   const start = Date.now();
   logger.info('PollRequestStart', { jobId, method: req.method });

@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
-import FireCrawlApp from '@mendable/firecrawl-js'
 
 export async function POST(request: Request) {
+  const { default: FireCrawlApp } = await import('@mendable/firecrawl-js')
+  
   const apiKey = process.env.FIRECRAWL_API_KEY
   if (!apiKey) {
     return NextResponse.json(
