@@ -40,7 +40,7 @@ function hashKey(h: string) { return `visual-search:${h}`; }
 ///////////////////////////
 
 export async function scheduleVisualSearch(jobId: string, imageBuffer: Buffer) {
-  const jobTimer = metrics.timer('visual_search.job_duration');
+  const start = Date.now();
   logger.info('JobStart', { jobId });
 
   try {
@@ -58,7 +58,7 @@ export async function scheduleVisualSearch(jobId: string, imageBuffer: Buffer) {
       logger.info('CacheHit', { jobId, hash });
       await redis.hmset(jobKey(jobId), { status: 'done', ...cached });
       await redis.expire(jobKey(jobId), JOB_TTL);
-      jobTimer();
+      metrics.timing('visual_search.job_duration', Date.now() - start);
       return;
     }
 
@@ -112,7 +112,7 @@ export async function scheduleVisualSearch(jobId: string, imageBuffer: Buffer) {
     await redis.hmset(jobKey(jobId), errorPayload as any);
     await redis.expire(jobKey(jobId), JOB_TTL);
   } finally {
-    jobTimer();
+    metrics.timing('visual_search.job_duration', Date.now() - start);
   }
 }
 
