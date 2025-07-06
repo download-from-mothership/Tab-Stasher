@@ -7,10 +7,7 @@ const redis = new Redis(config.redis.url);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { jobId } = req.query as { jobId: string };
-  const httpTimer = metrics.startTimer('http.request_duration', {
-    route: '/api/v1/visual-search/[jobId]',
-    method: req.method,
-  });
+  const start = Date.now();
   logger.info('PollRequestStart', { jobId, method: req.method });
 
   try {
@@ -55,6 +52,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     logger.error('PollException', { jobId, error: err.message });
     res.status(500).json({ error: 'Internal server error' });
   } finally {
-    httpTimer({ status_code: res.statusCode });
+    metrics.timing(
+      'http.request_duration',
+      Date.now() - start,
+      [`route:/api/v1/visual-search/[jobId]`, `method:${req.method}`, `status_code:${res.statusCode}`]
+    );
   }
 } 
