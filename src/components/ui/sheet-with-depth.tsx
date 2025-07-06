@@ -145,7 +145,7 @@ const SheetWithDepthStackScenery = ({ children, ref, ...restProps }: any) => {
 
   return (
     <SheetStack.Outlet
-      forComponent={sheetWithDepthStackId}
+      forComponent={sheetWithDepthStackId as unknown as any}
       stackingAnimation={{
         translateY: ({ progress }) =>
           progress <= 1
@@ -216,7 +216,7 @@ const SheetWithDepthRoot = ({
   return (
     <Sheet.Root
       license="commercial"
-      forComponent={sheetWithDepthStackId}
+      forComponent={sheetWithDepthStackId as unknown as any}
       {...restProps}
     >
       {children}
