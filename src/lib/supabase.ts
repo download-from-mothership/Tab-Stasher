@@ -85,8 +85,9 @@ export async function getTabs() {
         .eq('tab_id', tab.id)
 
       const tags = (tagRelations || [])
-        .map(relation => relation.tags?.name)
-        .filter(Boolean) as string[]
+        .flatMap(relation =>
+          relation.tags?.map(tag => tag.name as string) ?? []
+        )
 
       return {
         ...tab,
