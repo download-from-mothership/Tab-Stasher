@@ -10,23 +10,20 @@ const parallaxPageId = "parallax-page";
 
 interface ParallaxPageStackContextValue {
   stackId: ComponentId;
-  pageContainer: React.RefObject<React.ReactNode | null> | null;
-  menuTitleContainer: React.RefObject<React.ReactNode | null> | null;
-  menuLeftContainer: React.RefObject<React.ReactNode | null> | null;
+  pageContainer?: HTMLElement;
+  menuTitleContainer?: HTMLElement;
+  menuLeftContainer?: HTMLElement;
 }
 
 const ParallaxPageStackContext = React.createContext<ParallaxPageStackContextValue>({
   stackId: 'default' as unknown as ComponentId,
-  pageContainer: null,
-  menuTitleContainer: null,
-  menuLeftContainer: null,
 });
 
 interface ParallaxPageStackProps {
   stackId: ComponentId;
-  pageContainer: React.RefObject<React.ReactNode | null> | null;
-  menuTitleContainer: React.RefObject<React.ReactNode | null> | null;
-  menuLeftContainer: React.RefObject<React.ReactNode | null> | null;
+  pageContainer?: HTMLElement;
+  menuTitleContainer?: HTMLElement;
+  menuLeftContainer?: HTMLElement;
   children: React.ReactNode;
 }
 
