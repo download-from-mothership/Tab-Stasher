@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { timeOperation } from '@/lib/performance-monitor'
 
+export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
   }
 
   // Create Supabase client inside the request handler
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const supabase = createServerClient(
     supabaseUrl,
     supabaseAnonKey,

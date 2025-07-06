@@ -1,8 +1,14 @@
-name = "tab-stasher"
-type = "javascript"
-compatibility_date = "2024-01-01"
+name               = "tab-stasher"
+main               = ".open-next/worker.js"
+compatibility_date = "2025-07-06"
+compatibility_flags = ["nodejs_compat"]
 
-[site]
-bucket = ".next"
-include = ["**/*"]
-exclude = ["cache/**/*"] 
+[vars]
+  # your NEXTAUTH_URL, SUPABASE_URL, etc.
+
+# if you need any secrets:
+# (run `wrangler secret put FOO` for each one instead of hard-coding here)
+
+[assets]
+binding   = "ASSETS"
+directory = ".open-next/assets"

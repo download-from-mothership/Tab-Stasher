@@ -1,16 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+export const runtime = 'edge'
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const Redis = (await import('ioredis')).default;
   const { metrics, logger } = await import('../../../../lib/observability');
-  const { config } = await import('../../../../lib/config');
-  
-  const redisUrl = process.env.REDIS_URL;
-  if (!redisUrl) {
-    return res.status(500).json({ error: 'Redis configuration is not complete' });
-  }
-  
-  const redis = new Redis(redisUrl);
+  const { getJobResult } = await import('../../../../lib/visual-search-edge');
   
   const { jobId } = req.query as { jobId: string };
   const start = Date.now();
@@ -24,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return;
     }
 
-    const data = await redis.hgetall(`job:${jobId}`);
+    const data = await getJobResult(jobId);
     if (!data || !data.status) {
       metrics.increment('http.request_error', 1, ['step:job_not_found']);
       logger.warn('JobNotFound', { jobId });
