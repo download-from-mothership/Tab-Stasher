@@ -128,7 +128,7 @@ const ParallaxPage = ({
       {presentTrigger}
       <Sheet.Portal container={pageContainer}>
         <Sheet.View
-          forComponent={parallaxPageId}
+          forComponent={parallaxPageId as unknown as React.Context<any>}
           className="ParallaxPage-view"
           contentPlacement="right"
           swipeOvershoot={false}
