@@ -72,6 +72,8 @@ export async function getTabs() {
 
   if (error) throw error
 
+  console.log('[getTabs] Raw tabs from Supabase:', tabs)
+
   // Then get tags for each tab
   const tabsWithTags = await Promise.all(
     (tabs || []).map(async (tab) => {
@@ -85,9 +87,14 @@ export async function getTabs() {
         .eq('tab_id', tab.id)
 
       const tags = (tagRelations || [])
-        .flatMap(relation =>
-          relation.tags?.map(tag => tag.name as string) ?? []
-        )
+        .flatMap(relation => {
+          const tagsArr = Array.isArray(relation.tags)
+            ? relation.tags
+            : relation.tags
+              ? [relation.tags]
+              : [];
+          return tagsArr.map(tag => tag.name as string);
+        });
 
       return {
         ...tab,
@@ -95,6 +102,8 @@ export async function getTabs() {
       }
     })
   )
+
+  console.log('[getTabs] Final tabsWithTags:', tabsWithTags)
 
   return tabsWithTags
 }

@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { GalleryVerticalEnd } from "lucide-react"
+import { GalleryVerticalEnd, Menu } from "lucide-react"
 import { TabGroups } from "@/components/ui/tab-groups"
 import { AddTabDialog } from "@/components/ui/add-tab-dialog"
 import { Button } from "@/components/ui/button"
@@ -10,9 +10,11 @@ import { AuthButton } from "@/components/ui/auth-button"
 import { TabList } from "@/components/ui/tab-list"
 import { CategoryDashboard } from "@/components/ui/category-dashboard"
 import { useState } from "react"
+import { SilkSidebar } from "@/components/ui/silk-sidebar"
 
 export default function DashboardPage() {
   const [refreshKey, setRefreshKey] = useState(0)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const handleTabSaved = () => {
     setRefreshKey(prev => prev + 1)
@@ -23,9 +25,35 @@ export default function DashboardPage() {
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex items-center p-4">
-          <a href="/" className="flex items-center gap-3 font-medium">
-            <span className="font-semibold">Tab Stasher</span>
-          </a>
+          <SilkSidebar
+            presentTrigger={
+              <button
+                className="flex items-center gap-2 font-medium focus:outline-none"
+                onClick={() => setSidebarOpen(true)}
+                aria-label="Open Sidebar"
+                type="button"
+              >
+                <Menu className="h-5 w-5" />
+                <span className="font-semibold">Tab Stasher</span>
+              </button>
+            }
+            sheetContent={
+              <div className="space-y-8">
+                <section>
+                  <h2 className="text-2xl font-bold tracking-tight mb-1">Category Management</h2>
+                  <p className="text-muted-foreground mb-4">Monitor and manage your tab categories</p>
+                  <CategoryDashboard />
+                </section>
+                <section>
+                  <h2 className="text-2xl font-bold tracking-tight mb-1">Your Tab Groups</h2>
+                  <p className="text-muted-foreground mb-4">Organize your tabs into collections</p>
+                  <TabGroups />
+                </section>
+              </div>
+            }
+            presented={sidebarOpen}
+            onPresentedChange={setSidebarOpen}
+          />
           <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
             <div className="w-full flex-1 md:w-auto md:flex-none">
               {/* Add search functionality later */}
@@ -50,30 +78,6 @@ export default function DashboardPage() {
             
             {/* Tabs Grid */}
             <TabList refreshKey={refreshKey} />
-
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight">Your Tab Groups</h2>
-                <p className="text-muted-foreground">
-                  Organize your tabs into collections
-                </p>
-              </div>
-            </div>
-            
-            {/* Tab Groups Grid */}
-            <TabGroups />
-
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight">Category Management</h2>
-                <p className="text-muted-foreground">
-                  Monitor and manage your tab categories
-                </p>
-              </div>
-            </div>
-            
-            {/* Category Dashboard */}
-            <CategoryDashboard />
           </div>
         </div>
       </main>
