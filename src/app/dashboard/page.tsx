@@ -2,12 +2,13 @@
 
 export const dynamic = 'force-dynamic'
 
-import { GalleryVerticalEnd, Menu, Settings, LogOut, User } from "lucide-react"
+import { GalleryVerticalEnd, Menu, Settings, LogOut, User, Grid, Layers } from "lucide-react"
 import { TabGroups } from "@/components/ui/tab-groups"
 import { AddTabDialog } from "@/components/ui/add-tab-dialog"
 import { Button } from "@/components/ui/button"
 import { AuthButton } from "@/components/ui/auth-button"
 import { TabList } from "@/components/ui/tab-list"
+import { CategoryTabList } from "@/components/ui/category-tab-list"
 import { CategoryDashboard } from "@/components/ui/category-dashboard"
 import { useState, useEffect } from "react"
 import { SilkSidebar } from "@/components/ui/silk-sidebar"
@@ -19,6 +20,7 @@ export default function DashboardPage() {
   const [refreshKey, setRefreshKey] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [viewMode, setViewMode] = useState<'grid' | 'categories'>('categories')
 
   useEffect(() => {
     // Get initial user securely
@@ -124,6 +126,26 @@ export default function DashboardPage() {
               {/* Add search functionality later */}
             </div>
             <nav className="flex items-center space-x-4">
+              <div className="flex items-center gap-1 border rounded-lg p-1">
+                <Button
+                  variant={viewMode === 'categories' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('categories')}
+                  className="h-8 px-3"
+                >
+                  <Layers className="h-4 w-4 mr-2" />
+                  Categories
+                </Button>
+                <Button
+                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                  className="h-8 px-3"
+                >
+                  <Grid className="h-4 w-4 mr-2" />
+                  Grid
+                </Button>
+              </div>
               <AddTabDialog onTabSaved={handleTabSaved} />
               <AuthButton />
             </nav>
@@ -137,12 +159,24 @@ export default function DashboardPage() {
           <div className="flex flex-col gap-8">
             <div className="flex items-center justify-between">
               <div>
-                {/* Removed 'Your Tabs' heading and description */}
+                <h1 className="text-2xl font-bold tracking-tight">
+                  {viewMode === 'categories' ? 'Your Tabs by Category' : 'All Your Tabs'}
+                </h1>
+                <p className="text-muted-foreground">
+                  {viewMode === 'categories' 
+                    ? 'Browse your tabs organized by category with most recent first' 
+                    : 'View all your tabs in a simple grid layout'
+                  }
+                </p>
               </div>
             </div>
             
             {/* Tabs Grid */}
-            <TabList refreshKey={refreshKey} />
+            {viewMode === 'categories' ? (
+              <CategoryTabList refreshKey={refreshKey} />
+            ) : (
+              <TabList refreshKey={refreshKey} />
+            )}
           </div>
         </div>
       </main>
