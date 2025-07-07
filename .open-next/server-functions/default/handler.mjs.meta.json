@@ -4022,6 +4022,11 @@
       "imports": [],
       "format": "cjs"
     },
+    ".open-next/server-functions/default/.next/server/app/api/tabs/route_client-reference-manifest.js": {
+      "bytes": 8951,
+      "imports": [],
+      "format": "cjs"
+    },
     ".open-next/server-functions/default/.next/server/app/api/ocr-read/route_client-reference-manifest.js": {
       "bytes": 8959,
       "imports": [],
@@ -4029,11 +4034,6 @@
     },
     ".open-next/server-functions/default/.next/server/app/api/scrape-url/route_client-reference-manifest.js": {
       "bytes": 8963,
-      "imports": [],
-      "format": "cjs"
-    },
-    ".open-next/server-functions/default/.next/server/app/api/tabs/route_client-reference-manifest.js": {
-      "bytes": 8951,
       "imports": [],
       "format": "cjs"
     },
@@ -4101,6 +4101,11 @@
           "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/app/auth/callback/route_client-reference-manifest.js"
         },
         {
+          "path": ".open-next/server-functions/default/.next/server/app/api/tabs/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/app/api/tabs/route_client-reference-manifest.js"
+        },
+        {
           "path": ".open-next/server-functions/default/.next/server/app/api/ocr-read/route_client-reference-manifest.js",
           "kind": "require-call",
           "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/app/api/ocr-read/route_client-reference-manifest.js"
@@ -4109,11 +4114,6 @@
           "path": ".open-next/server-functions/default/.next/server/app/api/scrape-url/route_client-reference-manifest.js",
           "kind": "require-call",
           "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/app/api/scrape-url/route_client-reference-manifest.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/.next/server/app/api/tabs/route_client-reference-manifest.js",
-          "kind": "require-call",
-          "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/app/api/tabs/route_client-reference-manifest.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/api/image-proxy/route_client-reference-manifest.js",
@@ -4561,349 +4561,6 @@
         }
       ],
       "format": "cjs"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/max.js": {
-      "bytes": 55,
-      "imports": [],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/nil.js": {
-      "bytes": 55,
-      "imports": [],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/regex.js": {
-      "bytes": 171,
-      "imports": [],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/validate.js": {
-      "bytes": 142,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/regex.js",
-          "kind": "import-statement",
-          "original": "./regex.js"
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/parse.js": {
-      "bytes": 612,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/validate.js",
-          "kind": "import-statement",
-          "original": "./validate.js"
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js": {
-      "bytes": 1093,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/validate.js",
-          "kind": "import-statement",
-          "original": "./validate.js"
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/rng.js": {
-      "bytes": 305,
-      "imports": [
-        {
-          "path": "crypto",
-          "kind": "import-statement",
-          "external": true
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v1.js": {
-      "bytes": 2683,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/rng.js",
-          "kind": "import-statement",
-          "original": "./rng.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js",
-          "kind": "import-statement",
-          "original": "./stringify.js"
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v1ToV6.js": {
-      "bytes": 842,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/parse.js",
-          "kind": "import-statement",
-          "original": "./parse.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js",
-          "kind": "import-statement",
-          "original": "./stringify.js"
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/md5.js": {
-      "bytes": 300,
-      "imports": [
-        {
-          "path": "crypto",
-          "kind": "import-statement",
-          "external": true
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v35.js": {
-      "bytes": 1345,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/parse.js",
-          "kind": "import-statement",
-          "original": "./parse.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js",
-          "kind": "import-statement",
-          "original": "./stringify.js"
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v3.js": {
-      "bytes": 259,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/md5.js",
-          "kind": "import-statement",
-          "original": "./md5.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v35.js",
-          "kind": "import-statement",
-          "original": "./v35.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v35.js",
-          "kind": "import-statement",
-          "original": "./v35.js"
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/native.js": {
-      "bytes": 68,
-      "imports": [
-        {
-          "path": "crypto",
-          "kind": "import-statement",
-          "external": true
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v4.js": {
-      "bytes": 883,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/native.js",
-          "kind": "import-statement",
-          "original": "./native.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/rng.js",
-          "kind": "import-statement",
-          "original": "./rng.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js",
-          "kind": "import-statement",
-          "original": "./stringify.js"
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/sha1.js": {
-      "bytes": 303,
-      "imports": [
-        {
-          "path": "crypto",
-          "kind": "import-statement",
-          "external": true
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v5.js": {
-      "bytes": 262,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/sha1.js",
-          "kind": "import-statement",
-          "original": "./sha1.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v35.js",
-          "kind": "import-statement",
-          "original": "./v35.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v35.js",
-          "kind": "import-statement",
-          "original": "./v35.js"
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v6.js": {
-      "bytes": 464,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js",
-          "kind": "import-statement",
-          "original": "./stringify.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v1.js",
-          "kind": "import-statement",
-          "original": "./v1.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v1ToV6.js",
-          "kind": "import-statement",
-          "original": "./v1ToV6.js"
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v6ToV1.js": {
-      "bytes": 842,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/parse.js",
-          "kind": "import-statement",
-          "original": "./parse.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js",
-          "kind": "import-statement",
-          "original": "./stringify.js"
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v7.js": {
-      "bytes": 2129,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/rng.js",
-          "kind": "import-statement",
-          "original": "./rng.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js",
-          "kind": "import-statement",
-          "original": "./stringify.js"
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/version.js": {
-      "bytes": 208,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/validate.js",
-          "kind": "import-statement",
-          "original": "./validate.js"
-        }
-      ],
-      "format": "esm"
-    },
-    ".open-next/server-functions/default/node_modules/uuid/dist/esm/index.js": {
-      "bytes": 636,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/max.js",
-          "kind": "import-statement",
-          "original": "./max.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/nil.js",
-          "kind": "import-statement",
-          "original": "./nil.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/parse.js",
-          "kind": "import-statement",
-          "original": "./parse.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js",
-          "kind": "import-statement",
-          "original": "./stringify.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v1.js",
-          "kind": "import-statement",
-          "original": "./v1.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v1ToV6.js",
-          "kind": "import-statement",
-          "original": "./v1ToV6.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v3.js",
-          "kind": "import-statement",
-          "original": "./v3.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v4.js",
-          "kind": "import-statement",
-          "original": "./v4.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v5.js",
-          "kind": "import-statement",
-          "original": "./v5.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v6.js",
-          "kind": "import-statement",
-          "original": "./v6.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v6ToV1.js",
-          "kind": "import-statement",
-          "original": "./v6ToV1.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v7.js",
-          "kind": "import-statement",
-          "original": "./v7.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/validate.js",
-          "kind": "import-statement",
-          "original": "./validate.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/version.js",
-          "kind": "import-statement",
-          "original": "./version.js"
-        }
-      ],
-      "format": "esm"
     },
     ".open-next/server-functions/default/node_modules/hot-shots/lib/helpers.js": {
       "bytes": 3879,
@@ -7127,6 +6784,375 @@
       ],
       "format": "cjs"
     },
+    ".open-next/server-functions/default/.next/server/pages/api/v1/visual-search/[jobId].js": {
+      "bytes": 2598,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/hot-shots/index.js",
+          "kind": "require-call",
+          "original": "hot-shots"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/winston/lib/winston.js",
+          "kind": "require-call",
+          "original": "winston"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/next/dist/compiled/next-server/pages-api.runtime.prod.js",
+          "kind": "require-call",
+          "original": "next/dist/compiled/next-server/pages-api.runtime.prod.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/webpack-api-runtime.js",
+          "kind": "require-call",
+          "original": "../../../../webpack-api-runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/max.js": {
+      "bytes": 55,
+      "imports": [],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/nil.js": {
+      "bytes": 55,
+      "imports": [],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/regex.js": {
+      "bytes": 171,
+      "imports": [],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/validate.js": {
+      "bytes": 142,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/regex.js",
+          "kind": "import-statement",
+          "original": "./regex.js"
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/parse.js": {
+      "bytes": 612,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/validate.js",
+          "kind": "import-statement",
+          "original": "./validate.js"
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js": {
+      "bytes": 1093,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/validate.js",
+          "kind": "import-statement",
+          "original": "./validate.js"
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/rng.js": {
+      "bytes": 305,
+      "imports": [
+        {
+          "path": "crypto",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v1.js": {
+      "bytes": 2683,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/rng.js",
+          "kind": "import-statement",
+          "original": "./rng.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js",
+          "kind": "import-statement",
+          "original": "./stringify.js"
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v1ToV6.js": {
+      "bytes": 842,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/parse.js",
+          "kind": "import-statement",
+          "original": "./parse.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js",
+          "kind": "import-statement",
+          "original": "./stringify.js"
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/md5.js": {
+      "bytes": 300,
+      "imports": [
+        {
+          "path": "crypto",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v35.js": {
+      "bytes": 1345,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/parse.js",
+          "kind": "import-statement",
+          "original": "./parse.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js",
+          "kind": "import-statement",
+          "original": "./stringify.js"
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v3.js": {
+      "bytes": 259,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/md5.js",
+          "kind": "import-statement",
+          "original": "./md5.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v35.js",
+          "kind": "import-statement",
+          "original": "./v35.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v35.js",
+          "kind": "import-statement",
+          "original": "./v35.js"
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/native.js": {
+      "bytes": 68,
+      "imports": [
+        {
+          "path": "crypto",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v4.js": {
+      "bytes": 883,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/native.js",
+          "kind": "import-statement",
+          "original": "./native.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/rng.js",
+          "kind": "import-statement",
+          "original": "./rng.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js",
+          "kind": "import-statement",
+          "original": "./stringify.js"
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/sha1.js": {
+      "bytes": 303,
+      "imports": [
+        {
+          "path": "crypto",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v5.js": {
+      "bytes": 262,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/sha1.js",
+          "kind": "import-statement",
+          "original": "./sha1.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v35.js",
+          "kind": "import-statement",
+          "original": "./v35.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v35.js",
+          "kind": "import-statement",
+          "original": "./v35.js"
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v6.js": {
+      "bytes": 464,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js",
+          "kind": "import-statement",
+          "original": "./stringify.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v1.js",
+          "kind": "import-statement",
+          "original": "./v1.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v1ToV6.js",
+          "kind": "import-statement",
+          "original": "./v1ToV6.js"
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v6ToV1.js": {
+      "bytes": 842,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/parse.js",
+          "kind": "import-statement",
+          "original": "./parse.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js",
+          "kind": "import-statement",
+          "original": "./stringify.js"
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/v7.js": {
+      "bytes": 2129,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/rng.js",
+          "kind": "import-statement",
+          "original": "./rng.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js",
+          "kind": "import-statement",
+          "original": "./stringify.js"
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/version.js": {
+      "bytes": 208,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/validate.js",
+          "kind": "import-statement",
+          "original": "./validate.js"
+        }
+      ],
+      "format": "esm"
+    },
+    ".open-next/server-functions/default/node_modules/uuid/dist/esm/index.js": {
+      "bytes": 636,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/max.js",
+          "kind": "import-statement",
+          "original": "./max.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/nil.js",
+          "kind": "import-statement",
+          "original": "./nil.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/parse.js",
+          "kind": "import-statement",
+          "original": "./parse.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js",
+          "kind": "import-statement",
+          "original": "./stringify.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v1.js",
+          "kind": "import-statement",
+          "original": "./v1.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v1ToV6.js",
+          "kind": "import-statement",
+          "original": "./v1ToV6.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v3.js",
+          "kind": "import-statement",
+          "original": "./v3.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v4.js",
+          "kind": "import-statement",
+          "original": "./v4.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v5.js",
+          "kind": "import-statement",
+          "original": "./v5.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v6.js",
+          "kind": "import-statement",
+          "original": "./v6.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v6ToV1.js",
+          "kind": "import-statement",
+          "original": "./v6ToV1.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/v7.js",
+          "kind": "import-statement",
+          "original": "./v7.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/validate.js",
+          "kind": "import-statement",
+          "original": "./validate.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/uuid/dist/esm/version.js",
+          "kind": "import-statement",
+          "original": "./version.js"
+        }
+      ],
+      "format": "esm"
+    },
     ".open-next/server-functions/default/.next/server/pages/api/v1/visual-search.js": {
       "bytes": 6406,
       "imports": [
@@ -7154,32 +7180,6 @@
           "path": ".open-next/server-functions/default/.next/server/webpack-api-runtime.js",
           "kind": "require-call",
           "original": "../../../webpack-api-runtime.js"
-        }
-      ],
-      "format": "cjs"
-    },
-    ".open-next/server-functions/default/.next/server/pages/api/v1/visual-search/[jobId].js": {
-      "bytes": 2598,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/hot-shots/index.js",
-          "kind": "require-call",
-          "original": "hot-shots"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/winston/lib/winston.js",
-          "kind": "require-call",
-          "original": "winston"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/next/dist/compiled/next-server/pages-api.runtime.prod.js",
-          "kind": "require-call",
-          "original": "next/dist/compiled/next-server/pages-api.runtime.prod.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/.next/server/webpack-api-runtime.js",
-          "kind": "require-call",
-          "original": "../../../../webpack-api-runtime.js"
         }
       ],
       "format": "cjs"
@@ -7822,42 +7822,6 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/api/analyze-content/route.js": {
-      "bytes": 6347,
-      "imports": [
-        {
-          "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/after-task-async-storage.external.js",
-          "kind": "require-call",
-          "original": "next/dist/server/app-render/after-task-async-storage.external.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js",
-          "kind": "require-call",
-          "original": "next/dist/compiled/next-server/app-page.runtime.prod.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/work-async-storage.external.js",
-          "kind": "require-call",
-          "original": "next/dist/server/app-render/work-async-storage.external.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js",
-          "kind": "require-call",
-          "original": "next/dist/compiled/next-server/app-route.runtime.prod.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/work-unit-async-storage.external.js",
-          "kind": "require-call",
-          "original": "next/dist/server/app-render/work-unit-async-storage.external.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/.next/server/webpack-runtime.js",
-          "kind": "require-call",
-          "original": "../../../webpack-runtime.js"
-        }
-      ],
-      "format": "cjs"
-    },
     ".open-next/server-functions/default/.next/server/app/api/tabs/route.js": {
       "bytes": 6153,
       "imports": [
@@ -7940,6 +7904,42 @@
           "path": "events",
           "kind": "require-call",
           "external": true
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/webpack-runtime.js",
+          "kind": "require-call",
+          "original": "../../../webpack-runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/analyze-content/route.js": {
+      "bytes": 6347,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/after-task-async-storage.external.js",
+          "kind": "require-call",
+          "original": "next/dist/server/app-render/after-task-async-storage.external.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js",
+          "kind": "require-call",
+          "original": "next/dist/compiled/next-server/app-page.runtime.prod.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/work-async-storage.external.js",
+          "kind": "require-call",
+          "original": "next/dist/server/app-render/work-async-storage.external.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js",
+          "kind": "require-call",
+          "original": "next/dist/compiled/next-server/app-route.runtime.prod.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/work-unit-async-storage.external.js",
+          "kind": "require-call",
+          "original": "next/dist/server/app-render/work-unit-async-storage.external.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/webpack-runtime.js",
@@ -8045,8 +8045,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/(auth)/login/page.js": {
-      "bytes": 15489,
+    ".open-next/server-functions/default/.next/server/app/(auth)/signup/page.js": {
+      "bytes": 15354,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/after-task-async-storage.external.js",
@@ -8141,8 +8141,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/(auth)/signup/page.js": {
-      "bytes": 15354,
+    ".open-next/server-functions/default/.next/server/app/(auth)/login/page.js": {
+      "bytes": 15489,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/server/app-render/after-task-async-storage.external.js",
@@ -8392,14 +8392,14 @@
           "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/pages/_error.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/pages/api/v1/visual-search.js",
-          "kind": "require-call",
-          "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/pages/api/v1/visual-search.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/pages/api/v1/visual-search/[jobId].js",
           "kind": "require-call",
           "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/pages/api/v1/visual-search/[jobId].js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/pages/api/v1/visual-search.js",
+          "kind": "require-call",
+          "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/pages/api/v1/visual-search.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/pages/_document.js",
@@ -8437,14 +8437,14 @@
           "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/app/auth/callback/route.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/api/analyze-content/route.js",
-          "kind": "require-call",
-          "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/app/api/analyze-content/route.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/app/api/tabs/route.js",
           "kind": "require-call",
           "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/app/api/tabs/route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/analyze-content/route.js",
+          "kind": "require-call",
+          "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/app/api/analyze-content/route.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/page.js",
@@ -8452,14 +8452,14 @@
           "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/app/page.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/(auth)/login/page.js",
-          "kind": "require-call",
-          "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/app/(auth)/login/page.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/app/(auth)/signup/page.js",
           "kind": "require-call",
           "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/app/(auth)/signup/page.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/(auth)/login/page.js",
+          "kind": "require-call",
+          "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/app/(auth)/login/page.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/dashboard/page.js",
@@ -8800,14 +8800,14 @@
           "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/pages/_error.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/pages/api/v1/visual-search.js",
-          "kind": "require-call",
-          "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/pages/api/v1/visual-search.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/pages/api/v1/visual-search/[jobId].js",
           "kind": "require-call",
           "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/pages/api/v1/visual-search/[jobId].js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/pages/api/v1/visual-search.js",
+          "kind": "require-call",
+          "original": "/Users/aromano/Library/CloudStorage/ProtonDrive-acromano@pm.me-folder/KENSICO MGMT/APPS/TAB-STASHER/.open-next/server-functions/default/.next/server/pages/api/v1/visual-search.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/pages/_document.js",
@@ -10774,26 +10774,6 @@
           "external": true
         },
         {
-          "path": "crypto",
-          "kind": "import-statement",
-          "external": true
-        },
-        {
-          "path": "crypto",
-          "kind": "import-statement",
-          "external": true
-        },
-        {
-          "path": "crypto",
-          "kind": "import-statement",
-          "external": true
-        },
-        {
-          "path": "crypto",
-          "kind": "import-statement",
-          "external": true
-        },
-        {
           "path": "fs",
           "kind": "require-call",
           "external": true
@@ -11061,6 +11041,26 @@
         {
           "path": "stream",
           "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "crypto",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "crypto",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "crypto",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "crypto",
+          "kind": "import-statement",
           "external": true
         },
         {
@@ -12693,14 +12693,14 @@
         ".open-next/server-functions/default/.next/server/app/auth/callback/route_client-reference-manifest.js": {
           "bytesInOutput": 8412
         },
+        ".open-next/server-functions/default/.next/server/app/api/tabs/route_client-reference-manifest.js": {
+          "bytesInOutput": 8398
+        },
         ".open-next/server-functions/default/.next/server/app/api/ocr-read/route_client-reference-manifest.js": {
           "bytesInOutput": 8410
         },
         ".open-next/server-functions/default/.next/server/app/api/scrape-url/route_client-reference-manifest.js": {
           "bytesInOutput": 8416
-        },
-        ".open-next/server-functions/default/.next/server/app/api/tabs/route_client-reference-manifest.js": {
-          "bytesInOutput": 8398
         },
         ".open-next/server-functions/default/.next/server/app/api/image-proxy/route_client-reference-manifest.js": {
           "bytesInOutput": 8419
@@ -12821,69 +12821,6 @@
         },
         ".open-next/server-functions/default/.next/server/pages/_error.js": {
           "bytesInOutput": 10036
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/max.js": {
-          "bytesInOutput": 160
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/nil.js": {
-          "bytesInOutput": 160
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/regex.js": {
-          "bytesInOutput": 284
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/validate.js": {
-          "bytesInOutput": 242
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/parse.js": {
-          "bytesInOutput": 566
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js": {
-          "bytesInOutput": 901
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/rng.js": {
-          "bytesInOutput": 331
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v1.js": {
-          "bytesInOutput": 1855
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v1ToV6.js": {
-          "bytesInOutput": 727
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/md5.js": {
-          "bytesInOutput": 328
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v35.js": {
-          "bytesInOutput": 1071
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v3.js": {
-          "bytesInOutput": 261
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/native.js": {
-          "bytesInOutput": 177
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v4.js": {
-          "bytesInOutput": 687
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/sha1.js": {
-          "bytesInOutput": 351
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v5.js": {
-          "bytesInOutput": 263
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v6.js": {
-          "bytesInOutput": 391
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v6ToV1.js": {
-          "bytesInOutput": 705
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v7.js": {
-          "bytesInOutput": 1515
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/version.js": {
-          "bytesInOutput": 281
-        },
-        ".open-next/server-functions/default/node_modules/uuid/dist/esm/index.js": {
-          "bytesInOutput": 612
         },
         ".open-next/server-functions/default/node_modules/hot-shots/lib/helpers.js": {
           "bytesInOutput": 2117
@@ -13254,11 +13191,74 @@
         ".open-next/server-functions/default/.next/server/webpack-api-runtime.js": {
           "bytesInOutput": 2884
         },
-        ".open-next/server-functions/default/.next/server/pages/api/v1/visual-search.js": {
-          "bytesInOutput": 6765
-        },
         ".open-next/server-functions/default/.next/server/pages/api/v1/visual-search/[jobId].js": {
           "bytesInOutput": 2801
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/max.js": {
+          "bytesInOutput": 160
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/nil.js": {
+          "bytesInOutput": 160
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/regex.js": {
+          "bytesInOutput": 284
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/validate.js": {
+          "bytesInOutput": 242
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/parse.js": {
+          "bytesInOutput": 566
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/stringify.js": {
+          "bytesInOutput": 901
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/rng.js": {
+          "bytesInOutput": 331
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v1.js": {
+          "bytesInOutput": 1855
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v1ToV6.js": {
+          "bytesInOutput": 727
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/md5.js": {
+          "bytesInOutput": 328
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v35.js": {
+          "bytesInOutput": 1071
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v3.js": {
+          "bytesInOutput": 261
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/native.js": {
+          "bytesInOutput": 177
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v4.js": {
+          "bytesInOutput": 687
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/sha1.js": {
+          "bytesInOutput": 351
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v5.js": {
+          "bytesInOutput": 263
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v6.js": {
+          "bytesInOutput": 391
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v6ToV1.js": {
+          "bytesInOutput": 705
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/v7.js": {
+          "bytesInOutput": 1515
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/version.js": {
+          "bytesInOutput": 281
+        },
+        ".open-next/server-functions/default/node_modules/uuid/dist/esm/index.js": {
+          "bytesInOutput": 612
+        },
+        ".open-next/server-functions/default/.next/server/pages/api/v1/visual-search.js": {
+          "bytesInOutput": 6765
         },
         ".open-next/server-functions/default/.next/server/pages/_document.js": {
           "bytesInOutput": 467
@@ -13299,20 +13299,20 @@
         ".open-next/server-functions/default/.next/server/app/auth/callback/route.js": {
           "bytesInOutput": 19345
         },
-        ".open-next/server-functions/default/.next/server/app/api/analyze-content/route.js": {
-          "bytesInOutput": 6468
-        },
         ".open-next/server-functions/default/.next/server/app/api/tabs/route.js": {
           "bytesInOutput": 6391
+        },
+        ".open-next/server-functions/default/.next/server/app/api/analyze-content/route.js": {
+          "bytesInOutput": 6468
         },
         ".open-next/server-functions/default/.next/server/app/page.js": {
           "bytesInOutput": 10048
         },
-        ".open-next/server-functions/default/.next/server/app/(auth)/login/page.js": {
-          "bytesInOutput": 15891
-        },
         ".open-next/server-functions/default/.next/server/app/(auth)/signup/page.js": {
           "bytesInOutput": 15752
+        },
+        ".open-next/server-functions/default/.next/server/app/(auth)/login/page.js": {
+          "bytesInOutput": 15891
         },
         ".open-next/server-functions/default/.next/server/app/dashboard/page.js": {
           "bytesInOutput": 53555

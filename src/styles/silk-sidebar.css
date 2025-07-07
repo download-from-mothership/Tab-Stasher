@@ -19,4 +19,25 @@
    /* INNER-LAYOUT */
    display: flex;
    flex-direction: column;
+}
+
+.SilkSidebar-main {
+   /* SELF-LAYOUT */
+   flex: 1 1 auto;
+   overflow-y: auto;
+   overflow-x: hidden;
+}
+
+.SilkSidebar-footer {
+   /* SELF-LAYOUT */
+   flex-shrink: 0;
+   
+   /* APPEARANCE */
+   border-top: 1px solid hsl(var(--border));
+   padding: 16px;
+   
+   /* INNER-LAYOUT */
+   display: flex;
+   flex-direction: column;
+   gap: 8px;
 } 

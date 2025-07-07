@@ -6,11 +6,14 @@ import "@/styles/silk-sidebar.css";
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   presentTrigger: React.ReactNode;
   sheetContent: React.ReactNode;
+  footer?: React.ReactNode;
+  presented?: boolean;
+  onPresentedChange?: (presented: boolean) => void;
 }
 
-const SilkSidebar = ({ presentTrigger, sheetContent, ...restProps }: Props) => {
+const SilkSidebar = ({ presentTrigger, sheetContent, footer, presented, onPresentedChange, ...restProps }: Props) => {
   return (
-    <Sheet.Root license="non-commercial" sheetRole="dialog" {...restProps}>
+    <Sheet.Root license="non-commercial" sheetRole="dialog" presented={presented} onPresentedChange={onPresentedChange} {...restProps}>
       {presentTrigger}
       <Sheet.Portal>
         <Sheet.View
@@ -18,6 +21,7 @@ const SilkSidebar = ({ presentTrigger, sheetContent, ...restProps }: Props) => {
           contentPlacement="left"
           swipeOvershoot={false}
           nativeEdgeSwipePrevention={true}
+          onClickOutside={() => onPresentedChange?.(false)}
         >
           <Sheet.Backdrop />
           <Sheet.Content className="SilkSidebar-content">
@@ -27,7 +31,14 @@ const SilkSidebar = ({ presentTrigger, sheetContent, ...restProps }: Props) => {
                 Close Navigation Sidebar
               </Sheet.Trigger>
             </VisuallyHidden.Root>
-            {sheetContent}
+            <div className="SilkSidebar-main">
+              {sheetContent}
+            </div>
+            {footer && (
+              <div className="SilkSidebar-footer">
+                {footer}
+              </div>
+            )}
           </Sheet.Content>
         </Sheet.View>
       </Sheet.Portal>

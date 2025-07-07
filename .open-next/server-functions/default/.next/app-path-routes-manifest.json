@@ -5,10 +5,10 @@
   "/api/scrape-url/route": "/api/scrape-url",
   "/api/background-jobs/route": "/api/background-jobs",
   "/auth/callback/route": "/auth/callback",
-  "/api/analyze-content/route": "/api/analyze-content",
   "/api/tabs/route": "/api/tabs",
+  "/api/analyze-content/route": "/api/analyze-content",
   "/page": "/",
-  "/(auth)/login/page": "/login",
   "/(auth)/signup/page": "/signup",
+  "/(auth)/login/page": "/login",
   "/dashboard/page": "/dashboard"
 }

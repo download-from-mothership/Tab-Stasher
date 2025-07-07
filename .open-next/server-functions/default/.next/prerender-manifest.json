@@ -1,30 +1,6 @@
 {
   "version": 4,
   "routes": {
-    "/dashboard": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "Next-Action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/dashboard",
-      "dataRoute": "/dashboard.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/": {
       "experimentalBypassFor": [
         {
@@ -48,13 +24,37 @@
         "x-next-revalidated-tags",
         "x-next-revalidate-tag-token"
       ]
+    },
+    "/dashboard": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "Next-Action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/dashboard",
+      "dataRoute": "/dashboard.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
     }
   },
   "dynamicRoutes": {},
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "408a199331889731790f7c31c3465a01",
-    "previewModeSigningKey": "c2c8d14fe24c6aeebaaf102ea3b70edc1f2460510b124eb9af07bcf5c3ec7ba4",
-    "previewModeEncryptionKey": "249f5905e690f4bf10ecb2799037cd17cd2090a54c3ed45cbb44f1c078c0518c"
+    "previewModeId": "ca4c30f984fb19a59bd38000d274e954",
+    "previewModeSigningKey": "33b4d85346479df78384a1d226cc3c582406a702c56b7eea00c00aec984660c6",
+    "previewModeEncryptionKey": "e9c55192d9615b2fd656ee748800b835dd7f1ca562de70b87685bbe72c73b960"
   }
 }

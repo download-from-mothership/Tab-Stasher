@@ -8,15 +8,18 @@ export const supabase = createBrowserClient(
   {
     cookies: {
       get(name: string) {
+        if (typeof document === 'undefined') return undefined
         return document.cookie
           .split('; ')
           .find((row) => row.startsWith(`${name}=`))
           ?.split('=')[1]
       },
       set(name: string, value: string, options: { path?: string; maxAge?: number; domain?: string; secure?: boolean }) {
+        if (typeof document === 'undefined') return
         document.cookie = `${name}=${value}${options.path ? `; path=${options.path}` : ''}${options.maxAge ? `; max-age=${options.maxAge}` : ''}${options.domain ? `; domain=${options.domain}` : ''}${options.secure ? '; secure' : ''}`
       },
       remove(name: string, options: { path?: string; domain?: string }) {
+        if (typeof document === 'undefined') return
         document.cookie = `${name}=; max-age=0${options.path ? `; path=${options.path}` : ''}${options.domain ? `; domain=${options.domain}` : ''}`
       }
     }
