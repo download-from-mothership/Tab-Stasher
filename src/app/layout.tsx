@@ -7,7 +7,7 @@ import { Providers } from './providers'
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Silk Advanced Examples CSS",
+  title: "Tab-Stasher",
   description: "Native-like swipeable sheets on the web",
   other: {
     "apple-mobile-web-app-capable": "yes",

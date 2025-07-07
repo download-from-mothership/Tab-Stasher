@@ -67,57 +67,52 @@ export default function DashboardPage() {
               </Sheet.Trigger>
             }
             sheetContent={
-              <div className="flex flex-col h-full min-h-0">
-                {/* Main Content */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-8 min-h-0">
-                  <section>
-                    <h2 className="text-2xl font-bold tracking-tight mb-1">Category Management</h2>
-                    <p className="text-muted-foreground mb-4">Monitor and manage your tab categories</p>
-                    <CategoryDashboard />
-                  </section>
-                  <section>
-                    <h2 className="text-2xl font-bold tracking-tight mb-1">Your Tab Groups</h2>
-                    <p className="text-muted-foreground mb-4">Organize your tabs into collections</p>
-                    <TabGroups />
-                  </section>
-                </div>
-
-                {/* Footer */}
-                <div className="border-t bg-background p-4 mt-auto">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <User className="h-4 w-4 text-primary" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium truncate">
-                          {user?.email || 'Loading...'}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {user?.id ? 'Signed in' : 'Not signed in'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        aria-label="User settings"
-                      >
-                        <Settings className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={handleLogout}
-                        aria-label="Sign out"
-                      >
-                        <LogOut className="h-4 w-4" />
-                      </Button>
-                    </div>
+              <div className="p-4 space-y-8">
+                <section>
+                  <h2 className="text-2xl font-bold tracking-tight mb-1">Category Management</h2>
+                  <p className="text-muted-foreground mb-4">Monitor and manage your tab categories</p>
+                  <CategoryDashboard />
+                </section>
+                <section>
+                  <h2 className="text-2xl font-bold tracking-tight mb-1">Your Tab Groups</h2>
+                  <p className="text-muted-foreground mb-4">Organize your tabs into collections</p>
+                  <TabGroups />
+                </section>
+              </div>
+            }
+            footer={
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <User className="h-4 w-4 text-primary" />
                   </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium truncate">
+                      {user?.email || 'Loading...'}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {user?.id ? 'Signed in' : 'Not signed in'}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    aria-label="User settings"
+                  >
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={handleLogout}
+                    aria-label="Sign out"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             }
