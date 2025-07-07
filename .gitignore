@@ -91,4 +91,7 @@ logs
 .tmp/
 
 # Google Cloud SDK (too large for git)
-google-cloud-sdk/ 
+google-cloud-sdk/
+
+# OpenNext build files (contains sensitive environment variables)
+.open-next/ 
