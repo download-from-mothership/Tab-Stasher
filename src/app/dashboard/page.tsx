@@ -10,6 +10,7 @@ import { AuthButton } from "@/components/ui/auth-button"
 import { TabList } from "@/components/ui/tab-list"
 import { CategoryTabList } from "@/components/ui/category-tab-list"
 import { CategoryDashboard } from "@/components/ui/category-dashboard"
+import { SearchBar } from "@/components/ui/search-bar"
 import { useState, useEffect } from "react"
 import { SilkSidebar } from "@/components/ui/silk-sidebar"
 import { Sheet } from "@silk-hq/components"
@@ -21,6 +22,8 @@ export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [viewMode, setViewMode] = useState<'grid' | 'categories'>('categories')
+  const [searchQuery, setSearchQuery] = useState("")
+  const [searchResultsCount, setSearchResultsCount] = useState<number | null>(null)
 
   useEffect(() => {
     // Get initial user securely
@@ -50,10 +53,20 @@ export default function DashboardPage() {
     await supabase.auth.signOut()
   }
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    // Reset search results count when query changes
+    setSearchResultsCount(null)
+  }
+
+  const handleResultsCountChange = (count: number) => {
+    setSearchResultsCount(count)
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b border-neutral-200 bg-[color:var(--header)] bg-white/100 shadow-md backdrop-blur-none">
         <div className="container flex items-center p-4">
           <SilkSidebar
             presentTrigger={
@@ -101,7 +114,6 @@ export default function DashboardPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8"
                     aria-label="User settings"
                   >
                     <Settings className="h-4 w-4" />
@@ -109,7 +121,6 @@ export default function DashboardPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8"
                     onClick={handleLogout}
                     aria-label="Sign out"
                   >
@@ -123,7 +134,7 @@ export default function DashboardPage() {
           />
           <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
             <div className="w-full flex-1 md:w-auto md:flex-none">
-              {/* Add search functionality later */}
+              <SearchBar onSearch={handleSearch} className="max-w-lg" />
             </div>
             <nav className="flex items-center space-x-4">
               <div className="flex items-center gap-1 border rounded-lg p-1">
@@ -131,7 +142,6 @@ export default function DashboardPage() {
                   variant={viewMode === 'categories' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('categories')}
-                  className="h-8 px-3"
                 >
                   <Layers className="h-4 w-4 mr-2" />
                   Categories
@@ -140,7 +150,6 @@ export default function DashboardPage() {
                   variant={viewMode === 'grid' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('grid')}
-                  className="h-8 px-3"
                 >
                   <Grid className="h-4 w-4 mr-2" />
                   Grid
@@ -157,25 +166,39 @@ export default function DashboardPage() {
       <main className="flex-1 overflow-y-auto">
         <div className="container py-6 md:py-8">
           <div className="flex flex-col gap-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight">
-                  {viewMode === 'categories' ? 'Your Tabs by Category' : 'All Your Tabs'}
-                </h1>
-                <p className="text-muted-foreground">
-                  {viewMode === 'categories' 
-                    ? 'Browse your tabs organized by category with most recent first' 
-                    : 'View all your tabs in a simple grid layout'
+            {/* Search Results Info */}
+            {searchQuery && searchResultsCount !== null && (
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  {searchResultsCount === 0 
+                    ? `No results found for "${searchQuery}"`
+                    : `${searchResultsCount} result${searchResultsCount === 1 ? '' : 's'} found for "${searchQuery}"`
                   }
                 </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSearchQuery("")}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  Clear search
+                </Button>
               </div>
-            </div>
-            
+            )}
+
             {/* Tabs Grid */}
             {viewMode === 'categories' ? (
-              <CategoryTabList refreshKey={refreshKey} />
+              <CategoryTabList 
+                refreshKey={refreshKey} 
+                searchQuery={searchQuery} 
+                onResultsCountChange={handleResultsCountChange}
+              />
             ) : (
-              <TabList refreshKey={refreshKey} />
+              <TabList 
+                refreshKey={refreshKey} 
+                searchQuery={searchQuery} 
+                onResultsCountChange={handleResultsCountChange}
+              />
             )}
           </div>
         </div>

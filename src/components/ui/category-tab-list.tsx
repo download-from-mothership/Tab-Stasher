@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils"
 
 interface CategoryTabListProps {
   refreshKey?: number
+  searchQuery?: string
+  onResultsCountChange?: (count: number) => void
 }
 
 // Define Tab type locally to avoid importing from supabase
@@ -39,7 +41,7 @@ interface CategoryGroup {
   isExpanded: boolean
 }
 
-export function CategoryTabList({ refreshKey }: CategoryTabListProps) {
+export function CategoryTabList({ refreshKey, searchQuery = "", onResultsCountChange }: CategoryTabListProps) {
   const [tabs, setTabs] = useState<Tab[]>([])
   const [categoryGroups, setCategoryGroups] = useState<CategoryGroup[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -61,15 +63,30 @@ export function CategoryTabList({ refreshKey }: CategoryTabListProps) {
     fetchTabs()
   }, [refreshKey])
 
+  // Filter tabs based on search query
+  const filteredTabs = tabs.filter(tab => {
+    if (!searchQuery.trim()) return true
+    
+    const query = searchQuery.toLowerCase()
+    return (
+      tab.title?.toLowerCase().includes(query) ||
+      tab.description?.toLowerCase().includes(query) ||
+      tab.url.toLowerCase().includes(query) ||
+      tab.tags?.some(tag => tag.toLowerCase().includes(query)) ||
+      tab.primary_category?.toLowerCase().includes(query) ||
+      tab.secondary_category?.toLowerCase().includes(query)
+    )
+  })
+
   // Group tabs by category when tabs change
   useEffect(() => {
-    if (tabs.length === 0) {
+    if (filteredTabs.length === 0) {
       setCategoryGroups([])
       return
     }
 
     // Group tabs by primary category
-    const grouped = tabs.reduce((acc, tab) => {
+    const grouped = filteredTabs.reduce((acc, tab) => {
       const category = tab.primary_category || 'Uncategorized'
       
       if (!acc[category]) {
@@ -91,7 +108,14 @@ export function CategoryTabList({ refreshKey }: CategoryTabListProps) {
     categoryGroupsArray.sort((a, b) => b.tabs.length - a.tabs.length)
 
     setCategoryGroups(categoryGroupsArray)
-  }, [tabs])
+  }, [filteredTabs])
+
+  // Report results count
+  useEffect(() => {
+    if (onResultsCountChange) {
+      onResultsCountChange(filteredTabs.length)
+    }
+  }, [filteredTabs.length, onResultsCountChange])
 
   const toggleCategory = (categoryName: string) => {
     setCategoryGroups(prev => 
@@ -119,6 +143,14 @@ export function CategoryTabList({ refreshKey }: CategoryTabListProps) {
     )
   }
 
+  if (searchQuery && filteredTabs.length === 0) {
+    return (
+      <div className="text-center p-8">
+        <p className="text-muted-foreground">No tabs found matching "{searchQuery}"</p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {categoryGroups.map((category) => (
@@ -135,7 +167,17 @@ export function CategoryTabList({ refreshKey }: CategoryTabListProps) {
                 <ChevronRight className="h-5 w-5" />
               )}
               <div className="flex items-center gap-3">
-                <span>{category.name}</span>
+                <span
+                  className="category-name-theming px-3 py-1 rounded-lg font-bold text-base"
+                  style={{
+                    color: 'var(--primary-foreground)',
+                    background: 'var(--primary)',
+                    fontFamily: 'var(--font-sans)',
+                    letterSpacing: 'var(--tracking-normal)',
+                  }}
+                >
+                  {category.name}
+                </span>
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
                   {category.tabs.length} {category.tabs.length === 1 ? 'tab' : 'tabs'}
                 </span>
@@ -148,108 +190,83 @@ export function CategoryTabList({ refreshKey }: CategoryTabListProps) {
 
           {/* Category Tabs Grid */}
           {category.isExpanded && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {category.tabs.map((tab, index) => (
-                <div
-                  key={tab.id}
-                  className={cn(
-                    "relative group",
-                    // Add stacking effect - each card is slightly offset
-                    index > 0 && "transform -translate-y-2"
-                  )}
-                  style={{
-                    zIndex: category.tabs.length - index, // Higher index = higher z-index
-                    transform: index > 0 ? `translateY(-${index * 8}px)` : 'none'
-                  }}
-                >
-                  <SilkCard
-                    presentTrigger={
-                      <div className={cn(
-                        "w-[340px] h-[420px] flex flex-col justify-between bg-white rounded-lg shadow-md cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group-hover:shadow-2xl",
-                        // Add subtle border to show stacking order
-                        index > 0 && "border-2 border-primary/10"
-                      )}>
-                        {tab.image && (
-                          <div className="flex items-center justify-center py-6">
-                            <div className="w-72 h-72 rounded-xl bg-gray-50 flex items-center justify-center overflow-hidden">
-                              <img
-                                src={tab.image}
-                                alt={tab.title || "Tab preview"}
-                                className="object-contain w-full h-full rounded-xl"
+            <div className="overflow-x-auto">
+              <div className="flex gap-4 pb-4" style={{ minWidth: 'max-content' }}>
+                {category.tabs.map((tab, index) => (
+                  <div
+                    key={tab.id}
+                    className="relative group flex-shrink-0"
+                  >
+                    <SilkCard
+                      presentTrigger={
+                        <div className="w-[340px] h-[420px] flex flex-col justify-between bg-white rounded-lg shadow-md cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group-hover:shadow-2xl">
+                          {tab.image && (
+                            <div className="flex items-center justify-center py-6">
+                              <div className="w-72 h-72 rounded-xl bg-gray-50 flex items-center justify-center overflow-hidden">
+                                <img
+                                  src={tab.image}
+                                  alt={tab.title || "Tab preview"}
+                                  className="object-contain w-full h-full rounded-xl"
+                                />
+                              </div>
+                            </div>
+                          )}
+                          <div className="flex flex-col justify-end h-24 p-4">
+                            {/* Removed rank and date display */}
+                            <h3 className="text-lg font-bold leading-tight w-full line-clamp-2">
+                              {tab.title || "Untitled"}
+                            </h3>
+                          </div>
+                        </div>
+                      }
+                      sheetContent={
+                        <div className="p-6 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h2 className="text-lg font-semibold">{tab.title || "Untitled"}</h2>
+                            <div className="flex items-center gap-2">
+                              <Button variant="outline" size="sm" asChild>
+                                <a href={tab.url} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink className="h-4 w-4 mr-2" />
+                                  Open
+                                </a>
+                              </Button>
+                              <Button variant="ghost" size="sm">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            {tab.primary_category && (
+                              <CategoryBadge
+                                primaryCategory={tab.primary_category}
+                                secondaryCategory={tab.secondary_category || undefined}
+                                confidence={tab.category_confidence || undefined}
                               />
-                            </div>
+                            )}
                           </div>
-                        )}
-                        <div className="flex flex-col justify-end h-24 p-4">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs text-muted-foreground">
-                              #{index + 1} in {category.name}
-                            </span>
-                            <div className="flex items-center gap-1">
-                              {index === 0 && (
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 text-xs font-medium">
-                                  <Sparkles className="h-3 w-3" />
-                                  NEW
+                          {tab.tags && tab.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {tab.tags.map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary"
+                                >
+                                  {tag}
                                 </span>
-                              )}
-                              <span className="text-xs text-muted-foreground">
-                                {new Date(tab.created_at).toLocaleDateString()}
-                              </span>
+                              ))}
                             </div>
-                          </div>
-                          <h3 className="text-lg font-bold leading-tight w-full line-clamp-2">
-                            {tab.title || "Untitled"}
-                          </h3>
-                        </div>
-                      </div>
-                    }
-                    sheetContent={
-                      <div className="p-6 space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h2 className="text-lg font-semibold">{tab.title || "Untitled"}</h2>
-                          <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" asChild>
-                              <a href={tab.url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-4 w-4 mr-2" />
-                                Open
-                              </a>
-                            </Button>
-                            <Button variant="ghost" size="sm">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          {tab.primary_category && (
-                            <CategoryBadge
-                              primaryCategory={tab.primary_category}
-                              secondaryCategory={tab.secondary_category || undefined}
-                              confidence={tab.category_confidence || undefined}
-                            />
+                          )}
+                          {tab.description && (
+                            <p className="text-sm text-muted-foreground">
+                              {tab.description}
+                            </p>
                           )}
                         </div>
-                        {tab.tags && tab.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
-                            {tab.tags.map((tag) => (
-                              <span
-                                key={tag}
-                                className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        {tab.description && (
-                          <p className="text-sm text-muted-foreground">
-                            {tab.description}
-                          </p>
-                        )}
-                      </div>
-                    }
-                  />
-                </div>
-              ))}
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

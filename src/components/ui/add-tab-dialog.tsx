@@ -302,7 +302,7 @@ export function AddTabDialog({ onTabSaved }: AddTabDialogProps) {
       presented={open}
       onPresentedChange={handleOpenChange}
       presentTrigger={
-        <Button variant="outline" size="sm" className="gap-2" onClick={() => setOpen(true)}>
+        <Button variant="outline" size="default" className="gap-2 px-4" onClick={() => setOpen(true)}>
           <Plus className="h-4 w-4" />
           Add Tab
         </Button>

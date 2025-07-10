@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import "@/styles/globals.css";
 import { Providers } from './providers'
+import { ThemeProvider } from "@/components/ui/theme-provider"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,12 +31,19 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.className} suppressHydrationWarning>
       <body className={inter.className}>
-        <Providers>
-          <main className="container mx-auto py-6">
-            {children}
-          </main>
-        </Providers>
-        <Toaster richColors />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          <Providers>
+            <main className="container mx-auto py-6">
+              {children}
+            </main>
+          </Providers>
+          <Toaster richColors />
+        </ThemeProvider>
       </body>
     </html>
   )

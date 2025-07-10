@@ -12,6 +12,8 @@ import { SilkCard } from "@/components/ui/silk-card"
 
 interface TabListProps {
   refreshKey?: number
+  searchQuery?: string
+  onResultsCountChange?: (count: number) => void
 }
 
 // Define Tab type locally to avoid importing from supabase
@@ -32,7 +34,7 @@ interface Tab {
   auto_categorized_at: string | null
 }
 
-export function TabList({ refreshKey }: TabListProps) {
+export function TabList({ refreshKey, searchQuery = "", onResultsCountChange }: TabListProps) {
   const [tabs, setTabs] = useState<Tab[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -61,6 +63,28 @@ export function TabList({ refreshKey }: TabListProps) {
     )
   }
 
+  // Filter tabs based on search query
+  const filteredTabs = tabs.filter(tab => {
+    if (!searchQuery.trim()) return true
+    
+    const query = searchQuery.toLowerCase()
+    return (
+      tab.title?.toLowerCase().includes(query) ||
+      tab.description?.toLowerCase().includes(query) ||
+      tab.url.toLowerCase().includes(query) ||
+      tab.tags?.some(tag => tag.toLowerCase().includes(query)) ||
+      tab.primary_category?.toLowerCase().includes(query) ||
+      tab.secondary_category?.toLowerCase().includes(query)
+    )
+  })
+
+  // Report results count
+  useEffect(() => {
+    if (onResultsCountChange) {
+      onResultsCountChange(filteredTabs.length)
+    }
+  }, [filteredTabs.length, onResultsCountChange])
+
   if (tabs.length === 0) {
     return (
       <div className="text-center p-8">
@@ -69,9 +93,17 @@ export function TabList({ refreshKey }: TabListProps) {
     )
   }
 
+  if (searchQuery && filteredTabs.length === 0) {
+    return (
+      <div className="text-center p-8">
+        <p className="text-muted-foreground">No tabs found matching "{searchQuery}"</p>
+      </div>
+    )
+  }
+
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {tabs.map((tab) => (
+      {filteredTabs.map((tab) => (
         <SilkCard
           key={tab.id}
           presentTrigger={
