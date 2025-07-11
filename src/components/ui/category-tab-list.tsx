@@ -45,16 +45,24 @@ export function CategoryTabList({ refreshKey, searchQuery = "", onResultsCountCh
   const [tabs, setTabs] = useState<Tab[]>([])
   const [categoryGroups, setCategoryGroups] = useState<CategoryGroup[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     setIsLoading(true)
+    setError(null)
     const fetchTabs = async () => {
       try {
         const { getTabs } = await import('@/lib/supabase')
         const fetchedTabs = await getTabs()
-        setTabs(fetchedTabs)
+        // Ensure tabs is always an array and has valid data
+        const validTabs = Array.isArray(fetchedTabs) ? fetchedTabs.filter(tab => 
+          tab && typeof tab === 'object' && tab.id
+        ) : []
+        setTabs(validTabs)
       } catch (error) {
         console.error('Error fetching tabs:', error)
+        setError('Failed to load tabs')
+        setTabs([])
       } finally {
         setIsLoading(false)
       }
@@ -63,59 +71,81 @@ export function CategoryTabList({ refreshKey, searchQuery = "", onResultsCountCh
     fetchTabs()
   }, [refreshKey])
 
-  // Filter tabs based on search query
+  // Filter tabs based on search query with safe null checks
   const filteredTabs = tabs.filter(tab => {
     if (!searchQuery.trim()) return true
     
     const query = searchQuery.toLowerCase()
+    const title = tab.title?.toLowerCase() || ''
+    const description = tab.description?.toLowerCase() || ''
+    const url = tab.url?.toLowerCase() || ''
+    const tags = Array.isArray(tab.tags) ? tab.tags : []
+    const primaryCategory = tab.primary_category?.toLowerCase() || ''
+    const secondaryCategory = tab.secondary_category?.toLowerCase() || ''
+    
     return (
-      tab.title?.toLowerCase().includes(query) ||
-      tab.description?.toLowerCase().includes(query) ||
-      tab.url.toLowerCase().includes(query) ||
-      tab.tags?.some(tag => tag.toLowerCase().includes(query)) ||
-      tab.primary_category?.toLowerCase().includes(query) ||
-      tab.secondary_category?.toLowerCase().includes(query)
+      title.includes(query) ||
+      description.includes(query) ||
+      url.includes(query) ||
+      tags.some(tag => tag?.toLowerCase().includes(query)) ||
+      primaryCategory.includes(query) ||
+      secondaryCategory.includes(query)
     )
   })
 
   // Group tabs by category when tabs change
   useEffect(() => {
-    if (filteredTabs.length === 0) {
-      setCategoryGroups([])
-      return
-    }
-
-    // Group tabs by primary category
-    const grouped = filteredTabs.reduce((acc, tab) => {
-      const category = tab.primary_category || 'Uncategorized'
-      
-      if (!acc[category]) {
-        acc[category] = []
+    try {
+      if (filteredTabs.length === 0) {
+        setCategoryGroups([])
+        return
       }
-      
-      acc[category].push(tab)
-      return acc
-    }, {} as Record<string, Tab[]>)
 
-    // Convert to array and sort tabs within each category by created_at (newest first)
-    const categoryGroupsArray = Object.entries(grouped).map(([name, tabs]) => ({
-      name,
-      tabs: tabs.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
-      isExpanded: true // Start expanded
-    }))
+      // Group tabs by primary category
+      const grouped = filteredTabs.reduce((acc, tab) => {
+        const category = tab.primary_category || 'Uncategorized'
+        
+        if (!acc[category]) {
+          acc[category] = []
+        }
+        
+        acc[category].push(tab)
+        return acc
+      }, {} as Record<string, Tab[]>)
 
-    // Sort categories by total tabs (most tabs first)
-    categoryGroupsArray.sort((a, b) => b.tabs.length - a.tabs.length)
+      // Convert to array and sort tabs within each category by created_at (newest first)
+      const categoryGroupsArray = Object.entries(grouped).map(([name, tabs]) => ({
+        name,
+        tabs: tabs.sort((a, b) => {
+          const dateA = new Date(a.created_at || 0).getTime()
+          const dateB = new Date(b.created_at || 0).getTime()
+          return dateB - dateA
+        }),
+        isExpanded: true // Start expanded
+      }))
 
-    setCategoryGroups(categoryGroupsArray)
+      // Sort categories by total tabs (most tabs first)
+      categoryGroupsArray.sort((a, b) => b.tabs.length - a.tabs.length)
+
+      setCategoryGroups(categoryGroupsArray)
+    } catch (error) {
+      console.error('Error processing category groups:', error)
+      setCategoryGroups([])
+    }
   }, [filteredTabs])
 
   // Report results count
   useEffect(() => {
-    if (onResultsCountChange) {
-      onResultsCountChange(filteredTabs.length)
+    try {
+      if (typeof onResultsCountChange === 'function') {
+        onResultsCountChange(filteredTabs.length)
+      }
+    } catch (error) {
+      console.error('Error reporting results count:', error)
     }
-  }, [filteredTabs.length, onResultsCountChange])
+    // Only depend on filteredTabs.length to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filteredTabs.length])
 
   const toggleCategory = (categoryName: string) => {
     setCategoryGroups(prev => 
@@ -131,6 +161,14 @@ export function CategoryTabList({ refreshKey, searchQuery = "", onResultsCountCh
     return (
       <div className="flex items-center justify-center p-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="text-center p-8">
+        <p className="text-muted-foreground">Error loading tabs: {error}</p>
       </div>
     )
   }
@@ -184,22 +222,51 @@ export function CategoryTabList({ refreshKey, searchQuery = "", onResultsCountCh
               </div>
             </button>
             <div className="text-sm text-muted-foreground">
-              Most recent: {new Date(category.tabs[0]?.created_at || '').toLocaleDateString()}
+              Most recent: {(() => {
+                try {
+                  const firstTab = category.tabs[0]
+                  if (firstTab?.created_at) {
+                    return new Date(firstTab.created_at).toLocaleDateString()
+                  }
+                  return 'Unknown'
+                } catch (error) {
+                  return 'Unknown'
+                }
+              })()}
             </div>
           </div>
 
           {/* Category Tabs Grid */}
           {category.isExpanded && (
-            <div className="overflow-x-auto">
-              <div className="flex gap-4 pb-4" style={{ minWidth: 'max-content' }}>
+            <div
+              className="overflow-x-auto px-2"
+              style={{
+                scrollSnapType: 'x mandatory',
+                WebkitOverflowScrolling: 'touch',
+              }}
+            >
+              <div
+                className="flex gap-4 pb-4"
+                style={{
+                  minWidth: '100%',
+                  width: 'fit-content',
+                  maxWidth: 'none',
+                }}
+              >
                 {category.tabs.map((tab, index) => (
                   <div
                     key={tab.id}
                     className="relative group flex-shrink-0"
+                    style={{
+                      width: 'calc((100vw - 2rem - 3 * 1rem) / 4)', // 2rem for px-2 padding, 1rem gap
+                      maxWidth: '340px',
+                      minWidth: '220px',
+                      scrollSnapAlign: 'start',
+                    }}
                   >
                     <SilkCard
                       presentTrigger={
-                        <div className="w-[340px] h-[420px] flex flex-col justify-between bg-white rounded-lg shadow-md cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group-hover:shadow-2xl">
+                        <div className="w-full h-[420px] flex flex-col justify-between bg-white rounded-lg shadow-md cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group-hover:shadow-2xl">
                           {tab.image && (
                             <div className="flex items-center justify-center py-6">
                               <div className="w-72 h-72 rounded-xl bg-gray-50 flex items-center justify-center overflow-hidden">
@@ -207,6 +274,9 @@ export function CategoryTabList({ refreshKey, searchQuery = "", onResultsCountCh
                                   src={tab.image}
                                   alt={tab.title || "Tab preview"}
                                   className="object-contain w-full h-full rounded-xl"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none'
+                                  }}
                                 />
                               </div>
                             </div>
@@ -244,7 +314,7 @@ export function CategoryTabList({ refreshKey, searchQuery = "", onResultsCountCh
                               />
                             )}
                           </div>
-                          {tab.tags && tab.tags.length > 0 && (
+                          {tab.tags && Array.isArray(tab.tags) && tab.tags.length > 0 && (
                             <div className="flex flex-wrap gap-2">
                               {tab.tags.map((tag) => (
                                 <span
