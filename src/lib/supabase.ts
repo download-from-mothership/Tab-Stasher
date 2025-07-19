@@ -67,48 +67,166 @@ export async function createTab(data: Omit<Tab, 'id' | 'created_at' | 'user_id'>
 }
 
 export async function getTabs() {
-  // First get all tabs
-  const { data: tabs, error } = await supabase
-    .from('tabs')
-    .select('*')
-    .order('created_at', { ascending: false })
+  try {
+    // First get all tabs
+    const { data: tabs, error } = await supabase
+      .from('tabs')
+      .select('*')
+      .order('created_at', { ascending: false })
 
-  if (error) throw error
+    if (error) throw error
 
-  console.log('[getTabs] Raw tabs from Supabase:', tabs)
+    console.log('[getTabs] Raw tabs from Supabase:', tabs)
 
-  // Then get tags for each tab
-  const tabsWithTags = await Promise.all(
-    (tabs || []).map(async (tab) => {
-      const { data: tagRelations } = await supabase
-        .from('tabs_tags')
-        .select(`
-          tags (
-            name
-          )
-        `)
-        .eq('tab_id', tab.id)
+    // Ensure tabs is an array
+    if (!Array.isArray(tabs)) {
+      console.warn('[getTabs] Tabs is not an array, returning empty array')
+      return []
+    }
 
-      const tags = (tagRelations || [])
-        .flatMap(relation => {
-          const tagsArr = Array.isArray(relation.tags)
-            ? relation.tags
-            : relation.tags
-              ? [relation.tags]
-              : [];
-          return tagsArr.map(tag => tag.name as string);
-        });
+    // Then get tags for each tab
+    const tabsWithTags = await Promise.all(
+      tabs.map(async (tab) => {
+        try {
+          // Ensure tab has required properties
+          if (!tab || typeof tab !== 'object' || !tab.id) {
+            console.warn('[getTabs] Invalid tab object:', tab)
+            return null
+          }
 
-      return {
-        ...tab,
-        tags
-      }
-    })
-  )
+          const { data: tagRelations } = await supabase
+            .from('tabs_tags')
+            .select(`
+              tags (
+                name
+              )
+            `)
+            .eq('tab_id', tab.id)
 
-  console.log('[getTabs] Final tabsWithTags:', tabsWithTags)
+          const tags = (tagRelations || [])
+            .flatMap(relation => {
+              const tagsArr = Array.isArray(relation.tags)
+                ? relation.tags
+                : relation.tags
+                  ? [relation.tags]
+                  : [];
+              return tagsArr.map(tag => tag?.name as string).filter(Boolean);
+            });
 
-  return tabsWithTags
+          return {
+            ...tab,
+            tags: Array.isArray(tags) ? tags : []
+          }
+        } catch (error) {
+          console.error('[getTabs] Error processing tab:', error, tab)
+          // Return tab with empty tags array if tag processing fails
+          return {
+            ...tab,
+            tags: []
+          }
+        }
+      })
+    )
+
+    // Filter out null tabs and ensure all tabs have required properties
+    const validTabs = tabsWithTags.filter(tab => 
+      tab && 
+      typeof tab === 'object' && 
+      tab.id && 
+      typeof tab.id === 'string'
+    )
+
+    console.log('[getTabs] Final tabsWithTags:', validTabs)
+
+    return validTabs
+  } catch (error) {
+    console.error('[getTabs] Error fetching tabs:', error)
+    return []
+  }
+}
+
+export async function getRecentTabs(days: number = 7) {
+  try {
+    // Calculate the date 7 days ago
+    const sevenDaysAgo = new Date()
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - days)
+
+    // First get tabs from the last 7 days
+    const { data: tabs, error } = await supabase
+      .from('tabs')
+      .select('*')
+      .gte('created_at', sevenDaysAgo.toISOString())
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+
+    console.log('[getRecentTabs] Raw recent tabs from Supabase:', tabs)
+
+    // Ensure tabs is an array
+    if (!Array.isArray(tabs)) {
+      console.warn('[getRecentTabs] Tabs is not an array, returning empty array')
+      return []
+    }
+
+    // Then get tags for each tab
+    const tabsWithTags = await Promise.all(
+      tabs.map(async (tab) => {
+        try {
+          // Ensure tab has required properties
+          if (!tab || typeof tab !== 'object' || !tab.id) {
+            console.warn('[getRecentTabs] Invalid tab object:', tab)
+            return null
+          }
+
+          const { data: tagRelations } = await supabase
+            .from('tabs_tags')
+            .select(`
+              tags (
+                name
+              )
+            `)
+            .eq('tab_id', tab.id)
+
+          const tags = (tagRelations || [])
+            .flatMap(relation => {
+              const tagsArr = Array.isArray(relation.tags)
+                ? relation.tags
+                : relation.tags
+                  ? [relation.tags]
+                  : [];
+              return tagsArr.map(tag => tag?.name as string).filter(Boolean);
+            });
+
+          return {
+            ...tab,
+            tags: Array.isArray(tags) ? tags : []
+          }
+        } catch (error) {
+          console.error('[getRecentTabs] Error processing tab:', error, tab)
+          // Return tab with empty tags array if tag processing fails
+          return {
+            ...tab,
+            tags: []
+          }
+        }
+      })
+    )
+
+    // Filter out null tabs and ensure all tabs have required properties
+    const validTabs = tabsWithTags.filter(tab => 
+      tab && 
+      typeof tab === 'object' && 
+      tab.id && 
+      typeof tab.id === 'string'
+    )
+
+    console.log('[getRecentTabs] Final tabsWithTags:', validTabs)
+
+    return validTabs
+  } catch (error) {
+    console.error('[getRecentTabs] Error fetching recent tabs:', error)
+    return []
+  }
 }
 
 export async function deleteTab(id: string) {

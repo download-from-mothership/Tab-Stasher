@@ -57,9 +57,6 @@ export function LoginForm({
         user: data.user?.email
       })
 
-      // Show success message
-      toast.success("Logged in successfully")
-      
       // Ensure user is authenticated
       const { data: { user } } = await supabase.auth.getUser()
       console.log('Initial user check:', {
