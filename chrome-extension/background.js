@@ -225,39 +225,79 @@ class TabStasherBackground {
 
   async checkAuthentication() {
     try {
-      // Test authentication with dedicated auth check endpoint
+      // Try the dedicated auth check endpoint first
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
       console.log('Checking authentication with /api/auth/check endpoint...');
 
-      const response = await fetch(`${this.apiBaseUrl}/api/auth/check`, {
-        method: 'GET',
+      try {
+        const response = await fetch(`${this.apiBaseUrl}/api/auth/check`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const data = await response.json();
+
+          console.log('Auth check response:', {
+            status: response.status,
+            isAuthenticated: data.isAuthenticated,
+            user: data.user?.email
+          });
+
+          return {
+            isAuthenticated: data.isAuthenticated === true,
+            status: response.status,
+            user: data.user
+          };
+        }
+      } catch (endpointError) {
+        console.log('Primary auth endpoint failed, trying fallback...', endpointError.message);
+        clearTimeout(timeoutId);
+      }
+
+      // Fallback: Use /api/tabs endpoint to check authentication
+      console.log('Using fallback authentication check...');
+      const fallbackController = new AbortController();
+      const fallbackTimeoutId = setTimeout(() => fallbackController.abort(), 5000);
+
+      const fallbackResponse = await fetch(`${this.apiBaseUrl}/api/tabs`, {
+        method: 'POST',
         credentials: 'include',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        signal: controller.signal
+        body: JSON.stringify({ url: '' }),
+        signal: fallbackController.signal
       });
 
-      clearTimeout(timeoutId);
+      clearTimeout(fallbackTimeoutId);
 
-      const data = await response.json();
-
-      console.log('Auth check response:', {
-        status: response.status,
-        isAuthenticated: data.isAuthenticated,
-        user: data.user?.email
+      console.log('Fallback auth check response:', {
+        status: fallbackResponse.status,
+        ok: fallbackResponse.ok
       });
+
+      // 401 = not authenticated
+      // Anything else = authenticated (even 400 means auth passed, just bad data)
+      const isAuthenticated = fallbackResponse.status !== 401;
 
       return {
-        isAuthenticated: data.isAuthenticated === true,
-        status: response.status,
-        user: data.user
+        isAuthenticated: isAuthenticated,
+        status: fallbackResponse.status,
+        user: null
       };
     } catch (error) {
-      console.error('Auth check error:', error);
+      console.error('Auth check error (both methods failed):', error);
       return {
         isAuthenticated: false,
         error: error.message
@@ -312,12 +352,13 @@ class TabStasherBackground {
         status: authCheck.status,
         isAuthenticated: authCheck.isAuthenticated,
         delayMs,
-        attemptsRemaining
+        attemptsRemaining,
+        error: authCheck.error
       });
 
       if (authCheck.isAuthenticated) {
         // Auth completed successfully
-        console.log('Authentication successful!');
+        console.log('✅ Authentication successful!');
 
         chrome.tabs.remove(tabId).catch(error => {
           console.log('Could not close auth tab:', error.message);
@@ -340,17 +381,19 @@ class TabStasherBackground {
       } else if (attemptsRemaining > 0) {
         // Retry with exponential backoff (1s, 1.5s, 2.25s)
         const nextDelay = delayMs * 1.5;
-        console.log('Auth check failed, retrying in', nextDelay, 'ms');
+        console.log(`⏳ Auth check failed, retrying in ${nextDelay}ms (${attemptsRemaining} attempts remaining)`);
         this.retryAuthCheck(tabId, listener, attemptsRemaining - 1, nextDelay);
       } else {
-        console.log('Auth check failed after maximum attempts');
+        console.log('❌ Auth check failed after maximum attempts');
         chrome.tabs.onUpdated.removeListener(listener);
         // Note: Tab will remain open for user to complete login manually if needed
       }
     } catch (error) {
-      console.error('Error in retry auth check:', error);
+      console.error('❌ Error in retry auth check:', error);
       if (attemptsRemaining > 0) {
-        this.retryAuthCheck(tabId, listener, attemptsRemaining - 1, delayMs * 1.5);
+        const nextDelay = delayMs * 1.5;
+        console.log(`⏳ Retrying after error in ${nextDelay}ms`);
+        this.retryAuthCheck(tabId, listener, attemptsRemaining - 1, nextDelay);
       }
     }
   }
