@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tab Stasher Icon Generator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        .icon-preview {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .icon-size {
+            text-align: center;
+        }
+        .icon-size canvas {
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+        }
+        .icon-size p {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .instructions {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #374151;
+        }
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 5px 0;
+            color: #4b5563;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tab Stasher Chrome Extension Icons</h1>
+        
+        <p>This page generates the required PNG icons for the Chrome extension. Right-click each icon below and "Save image as" to download them.</p>
+        
+        <div class="icon-preview" id="iconPreview">
+            <!-- Icons will be generated here -->
+        </div>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Right-click each icon above</li>
+                <li>Select "Save image as"</li>
+                <li>Save with the filename shown below each icon</li>
+                <li>Place all saved PNG files in the <code>chrome-extension/icons/</code> folder</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // SVG content
+        const svgContent = `
+            <svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                
+                <circle cx="64" cy="64" r="60" fill="url(#gradient)" stroke="#ffffff" stroke-width="4"/>
+                
+                <rect x="20" y="30" width="80" height="60" rx="8" ry="8" fill="#ffffff" opacity="0.9"/>
+                
+                <rect x="30" y="45" width="40" height="3" rx="1.5" fill="#667eea"/>
+                <rect x="30" y="55" width="60" height="2" rx="1" fill="#667eea" opacity="0.7"/>
+                <rect x="30" y="65" width="50" height="2" rx="1" fill="#667eea" opacity="0.5"/>
+                
+                <circle cx="90" cy="50" r="12" fill="#10b981"/>
+                <line x1="85" y1="50" x2="95" y2="50" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                <line x1="90" y1="45" x2="90" y2="55" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        `;
+
+        // Icon sizes needed
+        const sizes = [16, 32, 48, 128];
+        
+        function generateIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Create image from SVG
+            const img = new Image();
+            const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(svgBlob);
+            
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, size, size);
+                URL.revokeObjectURL(url);
+            };
+            
+            img.src = url;
+            
+            return canvas;
+        }
+        
+        // Generate all icons
+        const preview = document.getElementById('iconPreview');
+        
+        sizes.forEach(size => {
+            const container = document.createElement('div');
+            container.className = 'icon-size';
+            
+            const canvas = generateIcon(size);
+            container.appendChild(canvas);
+            
+            const label = document.createElement('p');
+            label.textContent = `icon${size}.png`;
+            container.appendChild(label);
+            
+            preview.appendChild(container);
+        });
+    </script>
+</body>
+</html>

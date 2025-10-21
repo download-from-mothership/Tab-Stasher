@@ -1,0 +1,14 @@
+/* Content script styles for Tab Stasher Chrome Extension */
+
+#tab-stasher-toast-container {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.tab-stasher-toast {
+  cursor: pointer;
+}
+
+.tab-stasher-toast:hover {
+  opacity: 0.9;
+  transform: translateX(-2px) !important;
+}
