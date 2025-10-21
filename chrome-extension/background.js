@@ -132,10 +132,20 @@ class TabStasherBackground {
 
       clearTimeout(timeoutId);
 
+      console.log('Tab save response:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: {
+          contentType: response.headers.get('content-type')
+        }
+      });
+
       if (!response.ok) {
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
         try {
           const errorData = await response.json();
+          console.error('API error response:', errorData);
           errorMessage = errorData.error || errorMessage;
         } catch (parseError) {
           // If response body can't be parsed, use the status message
@@ -145,7 +155,13 @@ class TabStasherBackground {
       }
 
       const result = await response.json();
-      
+
+      console.log('✅ Tab saved successfully:', {
+        tabId: result.id,
+        title: result.title,
+        url: result.url
+      });
+
       // Show success notification
       this.showNotification(
         'Tab Saved!',
