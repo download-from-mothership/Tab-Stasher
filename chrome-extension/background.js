@@ -9,40 +9,71 @@ class TabStasherBackground {
 
   setupMessageHandlers() {
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      console.log('📨 Message received:', request.action);
+
       switch (request.action) {
         case 'saveTab':
           this.saveTab(request.tabData, sender.tab)
-            .then(result => sendResponse({ success: true, data: result }))
-            .catch(error => sendResponse({ success: false, error: error.message }));
+            .then(result => {
+              console.log('✅ saveTab response sent');
+              sendResponse({ success: true, data: result });
+            })
+            .catch(error => {
+              console.error('❌ saveTab error:', error.message);
+              sendResponse({ success: false, error: error.message });
+            });
           return true; // Keep message channel open for async response
 
         case 'getTabInfo':
           this.getTabInfo(sender.tab)
-            .then(result => sendResponse({ success: true, data: result }))
-            .catch(error => sendResponse({ success: false, error: error.message }));
+            .then(result => {
+              console.log('✅ getTabInfo response sent');
+              sendResponse({ success: true, data: result });
+            })
+            .catch(error => {
+              console.error('❌ getTabInfo error:', error.message);
+              sendResponse({ success: false, error: error.message });
+            });
           return true;
 
         case 'checkAuth':
           this.checkAuthentication()
-            .then(result => sendResponse(result))
-            .catch(error => sendResponse({ isAuthenticated: false, error: error.message }));
+            .then(result => {
+              console.log('✅ checkAuth response sent');
+              sendResponse(result);
+            })
+            .catch(error => {
+              console.error('❌ checkAuth error:', error.message);
+              sendResponse({ isAuthenticated: false, error: error.message });
+            });
           return true;
 
         case 'handleAuth':
-          this.handleAuth();
-          sendResponse({ success: true });
-          break;
+          console.log('🔐 Handling authentication flow...');
+          this.handleAuth()
+            .then(() => {
+              console.log('✅ handleAuth complete, response sent');
+              sendResponse({ success: true });
+            })
+            .catch(error => {
+              console.error('❌ handleAuth error:', error.message);
+              sendResponse({ success: false, error: error.message });
+            });
+          return true; // Keep channel open for async
 
         case 'logout':
+          console.log('🚪 Logging out...');
           this.performLogout();
           sendResponse({ success: true });
           break;
 
         case 'showNotification':
           this.showNotification(request.title, request.message, request.type);
+          sendResponse({ success: true });
           break;
 
         default:
+          console.warn('⚠️ Unknown action:', request.action);
           sendResponse({ success: false, error: 'Unknown action' });
       }
     });
@@ -416,11 +447,16 @@ class TabStasherBackground {
 }
 
 // Initialize the background script
-new TabStasherBackground();
+console.log('🚀 Tab Stasher Background Script Initializing...');
+const tabStasherBackground = new TabStasherBackground();
+console.log('✅ Tab Stasher Background Script Initialized');
 
 // Handle extension installation
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
-    console.log('Tab Stasher extension installed');
+    console.log('🎉 Tab Stasher extension installed');
+  }
+  if (details.reason === 'update') {
+    console.log('🔄 Tab Stasher extension updated');
   }
 });
