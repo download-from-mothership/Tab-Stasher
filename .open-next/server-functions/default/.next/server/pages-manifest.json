@@ -1,8 +1,0 @@
-{
-  "/api/v1/visual-search": "pages/api/v1/visual-search.js",
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/api/v1/visual-search/[jobId]": "pages/api/v1/visual-search/[jobId].js",
-  "/_document": "pages/_document.js",
-  "/404": "pages/404.html"
-}

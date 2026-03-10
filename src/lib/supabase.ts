@@ -1,6 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr'
 import { config } from './config'
-import { corsHeaders } from '@/app/_shared/cors'
 
 export const supabase = createBrowserClient(
   config.supabase.url,

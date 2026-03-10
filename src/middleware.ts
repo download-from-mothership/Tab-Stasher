@@ -1,10 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { corsHeaders } from '@/app/_shared/cors'
+import { getCorsHeaders } from '@/app/_shared/cors'
 
 export async function middleware(req: NextRequest) {
   console.log('Middleware called for path:', req.nextUrl.pathname)
+
+  const corsHeaders = getCorsHeaders(req.headers.get('origin'))
 
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {

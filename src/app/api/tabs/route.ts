@@ -1,17 +1,16 @@
 import { NextResponse } from 'next/server'
 import { timeOperation } from '@/lib/performance-monitor'
+import { getCorsHeaders } from '@/app/_shared/cors'
 
 export const dynamic = 'force-dynamic'
-
-
 
 export async function POST(request: Request) {
   const { createServerClient } = await import('@supabase/ssr')
   const { cookies } = await import('next/headers')
-  
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  
+
   if (!supabaseUrl || !supabaseAnonKey) {
     return NextResponse.json(
       { error: 'Supabase configuration is not complete' },
@@ -39,11 +38,7 @@ export async function POST(request: Request) {
     }
   )
 
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  }
+  const headers = getCorsHeaders(request.headers.get('origin'))
 
   if (request.method === 'OPTIONS') {
     return new NextResponse(null, { status: 200, headers })

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { getCorsHeaders } from '@/app/_shared/cors'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,11 +38,7 @@ export async function GET(request: Request) {
       }
     )
 
-    const headers = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    }
+    const headers = getCorsHeaders(request.headers.get('origin'))
 
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {
