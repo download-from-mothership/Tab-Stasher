@@ -8,8 +8,9 @@ import { ThemeProvider } from "@/components/ui/theme-provider"
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Tab-Stasher",
-  description: "Save any tab in one click. AI organizes it for you. Find it by screenshot.",
+  title: "Tab Stasher",
+  description: "Save, categorize, and search your browser tabs with AI-powered organization",
+  manifest: "/manifest.json",
   other: {
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "black-translucent",
