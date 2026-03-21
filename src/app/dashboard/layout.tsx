@@ -1,8 +1,13 @@
 "use client"
 
+export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
+
 import * as React from "react"
 import { CollapsibleSidebar } from "@/components/ui/collapsible-sidebar"
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar-context"
+import { TabsProvider } from "@/components/ui/tabs-context"
+import { ErrorBoundary } from "@/components/error-boundary"
 
 function DashboardLayoutContent({
   children,
@@ -33,10 +38,14 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <SidebarProvider>
-      <DashboardLayoutContent>
-        {children}
-      </DashboardLayoutContent>
-    </SidebarProvider>
+    <ErrorBoundary>
+      <TabsProvider>
+        <SidebarProvider>
+          <DashboardLayoutContent>
+            {children}
+          </DashboardLayoutContent>
+        </SidebarProvider>
+      </TabsProvider>
+    </ErrorBoundary>
   )
 } 

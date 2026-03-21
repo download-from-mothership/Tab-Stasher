@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server'
+import { timeOperation } from '@/lib/performance-monitor'
+import { parseBody, isErrorResponse, scrapeUrlSchema } from '@/lib/validation'
 
 export async function POST(request: Request) {
   const { default: FireCrawlApp } = await import('@mendable/firecrawl-js')
-  
+
   const apiKey = process.env.FIRECRAWL_API_KEY
   if (!apiKey) {
     return NextResponse.json(
@@ -14,18 +16,17 @@ export async function POST(request: Request) {
   const app = new FireCrawlApp({ apiKey })
 
   try {
-    const { url } = await request.json()
-
-    if (!url) {
-      return NextResponse.json(
-        { error: 'URL is required' },
-        { status: 400 }
-      )
-    }
+    const parsed = await parseBody(request, scrapeUrlSchema)
+    if (isErrorResponse(parsed)) return parsed
+    const { url } = parsed
 
     console.log('Starting URL scrape for:', url)
 
-    const scrapeResult = await app.scrapeUrl(url, { formats: ['markdown', 'html'] })
+    const scrapeResult = await timeOperation(
+      'Scrape URL',
+      () => app.scrapeUrl(url, { formats: ['markdown', 'html'] }),
+      5000 // 5 second threshold
+    )
 
     console.log('/api/scrape-url - scrapeResult (full):', JSON.stringify(scrapeResult, null, 2))
 

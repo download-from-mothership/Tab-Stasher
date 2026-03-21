@@ -1,5 +1,5 @@
 {
-  "name": "tab-stasher",
+  "name": "silk-advanced-examples-css",
   "version": "1.0.2",
   "type": "module",
   "scripts": {
@@ -70,7 +70,7 @@
     "dotenv": "^17.0.1",
     "eslint": "^8.56.0",
     "jest": "^29.7.0",
-    "ts-jest": "^29.4.0",
+    "ts-jest": "^29.4.6",
     "typescript": "^5.3.3"
   }
 }

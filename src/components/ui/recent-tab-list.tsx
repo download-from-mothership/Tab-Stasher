@@ -9,9 +9,9 @@ import { CategoryBadge } from "@/components/ui/category-badge"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import "@/styles/silk-card.css"
 import { SilkCard } from "@/components/ui/silk-card"
+import { useTabs } from "@/components/ui/tabs-context"
 
 interface RecentTabListProps {
-  refreshKey?: number
   searchQuery?: string
   onResultsCountChange?: (count: number) => void
 }
@@ -34,34 +34,8 @@ interface Tab {
   auto_categorized_at: string | null
 }
 
-export function RecentTabList({ refreshKey, searchQuery = "", onResultsCountChange }: RecentTabListProps) {
-  const [tabs, setTabs] = useState<Tab[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    setIsLoading(true)
-    setError(null)
-    const fetchRecentTabs = async () => {
-      try {
-        const { getRecentTabs } = await import('@/lib/supabase')
-        const fetchedTabs = await getRecentTabs(7) // Get tabs from last 7 days
-        // Ensure tabs is always an array and has valid data
-        const validTabs = Array.isArray(fetchedTabs) ? fetchedTabs.filter(tab => 
-          tab && typeof tab === 'object' && tab.id
-        ) : []
-        setTabs(validTabs)
-      } catch (error) {
-        console.error('Error fetching recent tabs:', error)
-        setError('Failed to load recent tabs')
-        setTabs([])
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchRecentTabs()
-  }, [refreshKey])
+export const RecentTabList = React.memo(function RecentTabList({ searchQuery = "", onResultsCountChange }: RecentTabListProps) {
+  const { recentTabs: tabs, isLoading, error } = useTabs()
 
   if (isLoading) {
     return (
@@ -110,7 +84,7 @@ export function RecentTabList({ refreshKey, searchQuery = "", onResultsCountChan
     } catch (error) {
       console.error('Error reporting results count:', error)
     }
-  }, [filteredTabs.length, onResultsCountChange])
+  }, [filteredTabs.length]) // Remove onResultsCountChange from dependencies to prevent infinite loop
 
   if (tabs.length === 0) {
     return (
@@ -232,4 +206,4 @@ export function RecentTabList({ refreshKey, searchQuery = "", onResultsCountChan
       </div>
     </div>
   )
-} 
+}) 

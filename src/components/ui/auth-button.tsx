@@ -29,12 +29,12 @@ export function AuthButton() {
       const { supabase } = await import('@/lib/supabase')
       
       // Get initial user securely
-      supabase.auth.getUser().then(({ data: { user } }) => {
+      supabase.auth.getUser().then(({ data: { user } }: { data: { user: User | null } }) => {
         setUser(user)
       })
 
       // Listen for auth changes
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
         if (event === 'SIGNED_IN' && session) {
           // Verify the user securely
           const { data: { user } } = await supabase.auth.getUser()

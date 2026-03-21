@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback, useEffect, useRef } from "react"
-import { Search, X, Loader2 } from "lucide-react"
+import { Search, X, Loader2, SlidersHorizontal } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -11,13 +11,21 @@ interface SearchBarProps {
   placeholder?: string
   className?: string
   debounceMs?: number
+  showFiltersToggle?: boolean
+  filtersOpen?: boolean
+  onToggleFilters?: () => void
+  activeFilterCount?: number
 }
 
-export function SearchBar({ 
-  onSearch, 
-  placeholder = "Search tabs...", 
+export function SearchBar({
+  onSearch,
+  placeholder = "Search tabs...",
   className,
-  debounceMs = 300 
+  debounceMs = 300,
+  showFiltersToggle = false,
+  filtersOpen = false,
+  onToggleFilters,
+  activeFilterCount = 0,
 }: SearchBarProps) {
   const [query, setQuery] = useState("")
   const [isFocused, setIsFocused] = useState(false)
@@ -28,7 +36,7 @@ export function SearchBar({
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current)
     }
-    
+
     setIsSearching(true)
     debounceTimeoutRef.current = setTimeout(() => {
       onSearch(searchQuery)
@@ -84,42 +92,62 @@ export function SearchBar({
 
   return (
     <div className={cn("relative w-full max-w-md", className)}>
-      <div className="relative">
-        {isSearching ? (
-          <Loader2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground animate-spin" />
-        ) : (
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        )}
-        <Input
-          type="text"
-          placeholder={placeholder}
-          value={query}
-          onChange={(e) => handleSearch(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          onKeyDown={handleKeyDown}
-          className={cn(
-            "pl-10 pr-10 h-9 transition-all duration-200 focus:ring-2 focus:ring-primary/20",
-            query && "ring-2 ring-primary/20 bg-primary/5"
+      <div className="relative flex items-center gap-1">
+        <div className="relative flex-1">
+          {isSearching ? (
+            <Loader2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground animate-spin" />
+          ) : (
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           )}
-        />
-        {query && (
+          <Input
+            type="text"
+            placeholder={placeholder}
+            value={query}
+            onChange={(e) => handleSearch(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            onKeyDown={handleKeyDown}
+            className={cn(
+              "pl-10 pr-10 h-9 transition-all duration-200 focus:ring-2 focus:ring-primary/20",
+              query && "ring-2 ring-primary/20 bg-primary/5"
+            )}
+          />
+          {query && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 hover:bg-muted transition-colors"
+              onClick={handleClear}
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          )}
+          {/* Keyboard shortcut hint */}
+          {!query && (
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+              <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+                <span className="text-xs">&#8984;</span>K
+              </kbd>
+            </div>
+          )}
+        </div>
+        {showFiltersToggle && (
           <Button
-            variant="ghost"
+            variant={filtersOpen || activeFilterCount > 0 ? "default" : "ghost"}
             size="icon"
-            className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 hover:bg-muted transition-colors"
-            onClick={handleClear}
+            className="h-9 w-9 shrink-0"
+            onClick={onToggleFilters}
+            title="Toggle search filters"
           >
-            <X className="h-3 w-3" />
+            <SlidersHorizontal className="h-4 w-4" />
+            {activeFilterCount > 0 && (
+              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
           </Button>
         )}
-        {/* Keyboard shortcut hint */}
-        <div className="absolute right-8 top-1/2 -translate-y-1/2 pointer-events-none">
-          <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
-            <span className="text-xs">⌘</span>K
-          </kbd>
-        </div>
       </div>
     </div>
   )
-} 
+}

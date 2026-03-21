@@ -3,8 +3,15 @@ main               = ".open-next/worker.js"
 compatibility_date = "2025-07-06"
 compatibility_flags = ["nodejs_compat","global_fetch_strictly_public"]
 
+# Custom domain routes - these work after adding the domain in Cloudflare Dashboard
+routes = [
+  { pattern = "tabstasher.com/*", custom_domain = true },
+  { pattern = "www.tabstasher.com/*", custom_domain = true }
+]
+
 [vars]
   # your NEXTAUTH_URL, SUPABASE_URL, etc.
+  NEXT_PUBLIC_SITE_URL = "https://tabstasher.com"
 
 # if you need any secrets:
 # (run `wrangler secret put FOO` for each one instead of hard-coding here)
@@ -19,3 +26,15 @@ bucket_name = "tab-stasher-cache"
 
 [observability.logs]
 enabled = true
+
+# Cron triggers for scheduled tasks
+# Format: "cron" = "minute hour day month weekday"
+# Runs every 2 minutes to check for new Instagram DMs
+[[triggers.crons]]
+cron = "*/2 * * * *"
+# The cron trigger will call: GET /api/cron/instagram-messages
+
+# Daily at 3am UTC: refresh Instagram tokens expiring within 7 days
+[[triggers.crons]]
+cron = "0 3 * * *"
+# The cron trigger will call: GET /api/cron/refresh-tokens

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { timeOperation } from '@/lib/performance-monitor'
 import { getCorsHeaders } from '@/app/_shared/cors'
+import { parseBody, isErrorResponse, createTabSchema } from '@/lib/validation'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,13 +9,15 @@ export async function POST(request: Request) {
   const { createServerClient } = await import('@supabase/ssr')
   const { cookies } = await import('next/headers')
 
+  const headers = getCorsHeaders(request.headers.get('origin'))
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseAnonKey) {
     return NextResponse.json(
       { error: 'Supabase configuration is not complete' },
-      { status: 500 }
+      { status: 500, headers }
     )
   }
 
@@ -38,14 +41,23 @@ export async function POST(request: Request) {
     }
   )
 
-  const headers = getCorsHeaders(request.headers.get('origin'))
-
-  if (request.method === 'OPTIONS') {
-    return new NextResponse(null, { status: 200, headers })
-  }
-
   try {
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    // Check for Instagram DM authentication header
+    const instagramUserId = request.headers.get('X-TabStasher-User-ID')
+    const source = request.headers.get('X-Source')
+    
+    let user = null
+    let authError = null
+    
+    if (instagramUserId && source === 'instagram_dm') {
+      // Instagram DM authentication - use the provided user ID
+      user = { id: instagramUserId }
+    } else {
+      // Regular authentication
+      const authResult = await supabase.auth.getUser()
+      user = authResult.data.user
+      authError = authResult.error
+    }
     
     if (authError || !user) {
       return NextResponse.json(
@@ -54,14 +66,9 @@ export async function POST(request: Request) {
       )
     }
 
-    const body = await request.json()
-    
-    if (!body.url) {
-      return NextResponse.json(
-        { error: 'URL is required' },
-        { status: 400, headers }
-      )
-    }
+    const parsed = await parseBody(request, createTabSchema)
+    if (isErrorResponse(parsed)) return parsed
+    const body = parsed
 
     console.log('Attempting to insert tab with data:', {
       url: body.url,
@@ -78,11 +85,16 @@ export async function POST(request: Request) {
       status: 'active'
     })
 
-    // Use provided categorization data - no need to re-categorize if already done
-    const primaryCategory = body.primaryCategory || 'uncategorized'
-    const secondaryCategory = body.secondaryCategory || 'general'
+    // Use provided categorization data, or default to 'uncategorized' if missing
+    // This allows tabs to be saved immediately even if categorization fails
+    // They can be batch processed later via /api/tabs/reprocess-categories
+    const primaryCategory = (body.primaryCategory || 'uncategorized').toLowerCase().trim()
+    const secondaryCategory = (body.secondaryCategory || 'general').toLowerCase().trim()
     const confidence = body.confidence || 0.5
-    const autoCategorizedAt = body.primaryCategory ? new Date().toISOString() : null
+    // Only set auto_categorized_at if we actually have a real category (not 'uncategorized')
+    const autoCategorizedAt = (body.primaryCategory && primaryCategory !== 'uncategorized') 
+      ? new Date().toISOString() 
+      : null
 
     // Prepare tags for batch processing
     const tagsToProcess = body.tags || []
@@ -126,26 +138,55 @@ export async function POST(request: Request) {
       )
     }
 
-    // Return the tab ID and success status instead of fetching the entire tab
-    const savedTab = {
-      id: result.data[0].tab_id,
-      url: body.url,
-      title: body.title,
-      description: body.description,
-      image: body.image,
-      favicon: body.favicon,
-      content: body.content,
-      primary_category: primaryCategory,
-      secondary_category: secondaryCategory,
-      category_confidence: confidence,
-      auto_categorized_at: autoCategorizedAt,
-      user_id: user.id,
-      status: 'active',
-      created_at: new Date().toISOString(),
-      tags: tagNames
+    const isDuplicate = result.data[0].is_duplicate || false
+    const tabId = result.data[0].tab_id
+
+    // Fetch the actual tab data to get accurate timestamps and metadata
+    const { data: tabData, error: fetchError } = await supabase
+      .from('tabs')
+      .select('id, url, title, description, image, favicon, content, primary_category, secondary_category, category_confidence, auto_categorized_at, created_at, updated_at, status')
+      .eq('id', tabId)
+      .single()
+
+    if (fetchError || !tabData) {
+      console.warn('Could not fetch tab data after save, using provided data:', fetchError)
     }
 
-    console.log('Successfully created tab:', savedTab.id)
+    // Get tags for the tab
+    const { data: tabTags } = await supabase
+      .from('tabs_tags')
+      .select('tag_id, tags(name)')
+      .eq('tab_id', tabId)
+
+    const tagNamesFromDb = tabTags?.map((tt: any) => tt.tags?.name).filter(Boolean) || tagNames
+
+    // Return the tab with duplicate status
+    const savedTab = {
+      id: tabId,
+      url: tabData?.url || body.url,
+      title: tabData?.title || body.title,
+      description: tabData?.description || body.description,
+      image: tabData?.image || body.image,
+      favicon: tabData?.favicon || body.favicon,
+      content: tabData?.content || body.content,
+      primary_category: tabData?.primary_category || primaryCategory,
+      secondary_category: tabData?.secondary_category || secondaryCategory,
+      category_confidence: tabData?.category_confidence || confidence,
+      auto_categorized_at: tabData?.auto_categorized_at || autoCategorizedAt,
+      user_id: user.id,
+      status: tabData?.status || 'active',
+      created_at: tabData?.created_at || new Date().toISOString(),
+      updated_at: tabData?.updated_at || new Date().toISOString(),
+      tags: tagNamesFromDb,
+      is_duplicate: isDuplicate
+    }
+
+    if (isDuplicate) {
+      console.log('Updated existing tab (duplicate detected):', savedTab.id)
+    } else {
+      console.log('Successfully created new tab:', savedTab.id)
+    }
+    
     return NextResponse.json(savedTab, { headers })
   } catch (error) {
     console.error('Error in POST /api/tabs:', error)

@@ -2,10 +2,26 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getCorsHeaders } from '@/app/_shared/cors'
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit'
+
+function getRateLimitTier(path: string): keyof typeof RATE_LIMITS {
+  if (path.startsWith('/api/analyze-content') || path.startsWith('/api/scrape-url') || path.startsWith('/api/ocr-read') || path.startsWith('/api/tabs/summarize')) {
+    return 'expensive'
+  }
+  if (path === '/login' || path === '/signup' || path.startsWith('/api/auth') || path.startsWith('/auth/callback')) {
+    return 'auth'
+  }
+  if (path.startsWith('/api/v1/')) {
+    return 'api' // public REST API uses standard tier
+  }
+  if (path.startsWith('/api/')) {
+    return 'api'
+  }
+  return 'public'
+}
 
 export async function middleware(req: NextRequest) {
-  console.log('Middleware called for path:', req.nextUrl.pathname)
-
+  const path = req.nextUrl.pathname
   const corsHeaders = getCorsHeaders(req.headers.get('origin'))
 
   // Handle CORS preflight requests
@@ -13,7 +29,34 @@ export async function middleware(req: NextRequest) {
     return new NextResponse(null, { headers: corsHeaders })
   }
 
+  // Rate limiting for API routes
+  if (path.startsWith('/api/')) {
+    const ip = req.headers.get('cf-connecting-ip') || req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const tier = getRateLimitTier(path)
+    const result = checkRateLimit(`${tier}:${ip}`, RATE_LIMITS[tier])
+
+    if (!result.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        {
+          status: 429,
+          headers: {
+            ...corsHeaders,
+            'Retry-After': String(Math.ceil(result.retryAfterMs / 1000)),
+            'X-RateLimit-Remaining': '0',
+          },
+        }
+      )
+    }
+  }
+
   const res = NextResponse.next()
+
+  // Add request ID for traceability
+  const requestId = crypto.randomUUID()
+  res.headers.set('X-Request-Id', requestId)
+  // Pass to downstream route handlers via request header
+  req.headers.set('X-Request-Id', requestId)
 
   // Create a Supabase client with explicit cookie handling
   const supabase = createServerClient(
@@ -64,12 +107,8 @@ export async function middleware(req: NextRequest) {
     res.headers.set(key, value)
   })
 
-  // Get the pathname of the request
-  const path = req.nextUrl.pathname
-
   // Define protected and public paths
   const isAuthPage = path.startsWith('/login') || path.startsWith('/signup')
-  const isApiRoute = path.startsWith('/api')
   const isProtectedRoute = path.startsWith('/dashboard')
   const isAuthCallback = path.startsWith('/auth/callback')
   
