@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { timeOperation } from '@/lib/performance-monitor'
 import { getCorsHeaders } from '@/app/_shared/cors'
 import { parseBody, isErrorResponse, createTabSchema } from '@/lib/validation'
+import { trackedQuery } from '@/lib/supabase-server'
 
 export const dynamic = 'force-dynamic'
 

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { buildCacheHeaders, CACHE_PROFILES } from '@/lib/edge-cache'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'edge'
@@ -66,6 +67,9 @@ export async function GET() {
       timestamp: new Date().toISOString(),
       checks,
     },
-    { status: httpStatus }
+    {
+      status: httpStatus,
+      headers: buildCacheHeaders(CACHE_PROFILES.publicShort),
+    }
   )
 }
